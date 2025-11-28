@@ -13,12 +13,14 @@ export class ToDoManager {
         this.repository = new InMemoryRepository<Todo>();
         this.api = new TodoApi();
         this.service = new TodoService(this.api);
-        
-        // Инициализируем демо-данные
-        this.initDemoData();
     }
 
-    private initDemoData(): void {
+    async init(): Promise<void> {
+        // Clear existing data
+        const existing = this.repository.findAll();
+        existing.forEach(todo => this.repository.remove(todo.id));
+        
+        // Add demo data
         const demoData: Todo[] = [
             {
                 id: 1,
@@ -37,20 +39,12 @@ export class ToDoManager {
             {
                 id: 3,
                 title: 'Write documentation',
-                description: 'Document the codebase',
                 status: TodoStatus.COMPLETED,
                 createdAt: new Date()
             }
         ];
 
         demoData.forEach(todo => this.repository.add(todo));
-    }
-
-    async init(): Promise<void> {
-        // Переинициализируем демо-данные
-        const allTodos = this.repository.findAll();
-        allTodos.forEach(todo => this.repository.remove(todo.id));
-        this.initDemoData();
     }
 
     async add(title: string, description: string = ''): Promise<void> {
