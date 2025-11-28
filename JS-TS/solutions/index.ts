@@ -1,6 +1,4 @@
 //10.1
-#!/usr/bin/env node
-
 import { ToDoManager } from './todo-manager';
 import { TodoStatus } from './types';
 
@@ -57,7 +55,6 @@ class TodoCLI {
                         if (todo.description) {
                             console.log(`   📝 ${todo.description}`);
                         }
-                        console.log(`   📅 ${todo.createdAt.toLocaleDateString()}`);
                     });
                     break;
 
@@ -74,22 +71,22 @@ class TodoCLI {
     private showHelp(): void {
         console.log(`
 Todo Manager CLI - Usage:
-  npm run todo init                    - Initialize with demo data
-  npm run todo add <title> [desc]      - Add a new todo
-  npm run todo complete <id>           - Mark todo as completed
-  npm run todo list                    - List all todos
-  npm run todo help                    - Show this help message
+  init                    - Initialize with demo data
+  add <title> [desc]      - Add a new todo
+  complete <id>           - Mark todo as completed
+  list                    - List all todos
+  help                    - Show this help message
 
 Examples:
-  npm run todo add "Learn Node.js"
-  npm run todo add "Build API" "Create RESTful endpoints"
-  npm run todo complete 1
-  npm run todo list
+  add "Learn Node.js"
+  add "Build API" "Create RESTful endpoints"
+  complete 1
+  list
         `);
     }
 }
 
-// Запуск CLI
+// Run CLI
 if (require.main === module) {
     const cli = new TodoCLI();
     cli.handleCommand().catch(console.error);
