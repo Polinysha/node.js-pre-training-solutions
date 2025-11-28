@@ -1,23 +1,34 @@
 import { TodoService } from './todo-service';
 import { TodoApi } from './todo-api';
+import { InMemoryRepository } from './in-memory-repository';
 import { Todo } from './types';
 
 export class ToDoManager {
-  private service = new TodoService(new TodoApi());
+  private service: TodoService;
+
+  constructor() {
+    const repository = new InMemoryRepository();
+    const api = new TodoApi(repository);
+    this.service = new TodoService(api);
+  }
 
   async init(): Promise<void> {
-    throw new Error('init: not implemented');
+    // Seed with demo data
+    await this.add('Learn TypeScript', 'Complete the TypeScript tutorial');
+    await this.add('Build Todo App', 'Implement the todo manager facade');
+    await this.add('Write Tests', 'Ensure all functionality works correctly');
+    console.log('Demo data initialized successfully');
   }
 
   async add(title: string, description = ''): Promise<void> {
-    throw new Error('add: not implemented');
+    await this.service.addTodo(title, description);
   }
 
   async complete(id: number): Promise<void> {
-    throw new Error('complete: not implemented');
+    await this.service.completeTodo(id);
   }
 
   async list(): Promise<Todo[]> {
-    throw new Error('list: not implemented');
+    return await this.service.getTodos();
   }
 }
