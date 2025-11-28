@@ -1,34 +1,74 @@
-import { TodoService } from './todo-service';
+// 10
+import { Todo, TodoStatus } from './types';
+import { InMemoryRepository } from './repository';
 import { TodoApi } from './todo-api';
-import { InMemoryRepository } from './in-memory-repository';
-import { Todo } from './types';
+import { TodoService } from './todo-service';
 
 export class ToDoManager {
-  private service: TodoService;
+    private repository: InMemoryRepository<Todo>;
+    private api: TodoApi;
+    private service: TodoService;
 
-  constructor() {
-    const repository = new InMemoryRepository();
-    const api = new TodoApi(repository);
-    this.service = new TodoService(api);
-  }
+    constructor() {
+        this.repository = new InMemoryRepository<Todo>();
+        this.api = new TodoApi();
+        this.service = new TodoService(this.api);
+        
+        // Инициализируем демо-данные
+        this.initDemoData();
+    }
 
-  async init(): Promise<void> {
-    // Seed with demo data
-    await this.add('Learn TypeScript', 'Complete the TypeScript tutorial');
-    await this.add('Build Todo App', 'Implement the todo manager facade');
-    await this.add('Write Tests', 'Ensure all functionality works correctly');
-    console.log('Demo data initialized successfully');
-  }
+    private initDemoData(): void {
+        const demoData: Todo[] = [
+            {
+                id: 1,
+                title: 'Learn TypeScript',
+                description: 'Study types and interfaces',
+                status: TodoStatus.PENDING,
+                createdAt: new Date()
+            },
+            {
+                id: 2,
+                title: 'Build a project',
+                description: 'Create a full-stack application',
+                status: TodoStatus.IN_PROGRESS,
+                createdAt: new Date()
+            },
+            {
+                id: 3,
+                title: 'Write documentation',
+                description: 'Document the codebase',
+                status: TodoStatus.COMPLETED,
+                createdAt: new Date()
+            }
+        ];
 
-  async add(title: string, description = ''): Promise<void> {
-    await this.service.addTodo(title, description);
-  }
+        demoData.forEach(todo => this.repository.add(todo));
+    }
 
-  async complete(id: number): Promise<void> {
-    await this.service.completeTodo(id);
-  }
+    async init(): Promise<void> {
+        // Переинициализируем демо-данные
+        const allTodos = this.repository.findAll();
+        allTodos.forEach(todo => this.repository.remove(todo.id));
+        this.initDemoData();
+    }
 
-  async list(): Promise<Todo[]> {
-    return await this.service.getTodos();
-  }
+    async add(title: string, description: string = ''): Promise<void> {
+        const todo = await this.service.create(title, description);
+        this.repository.add(todo);
+    }
+
+    async complete(id: number): Promise<void> {
+        const todo = this.repository.findById(id);
+        if (!todo) {
+            throw new Error(`Todo with id ${id} not found`);
+        }
+        
+        await this.service.toggleStatus(id);
+        this.repository.update(id, { status: TodoStatus.COMPLETED });
+    }
+
+    async list(): Promise<Todo[]> {
+        return this.repository.findAll();
+    }
 }
