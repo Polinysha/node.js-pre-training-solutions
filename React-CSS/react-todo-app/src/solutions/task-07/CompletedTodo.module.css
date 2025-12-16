@@ -1,0 +1,7 @@
+﻿.completed {
+  text-decoration: line-through;
+  color: #666;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ddd;
+}

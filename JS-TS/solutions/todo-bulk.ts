@@ -1,13 +1,42 @@
 import { Todo, TodoStatus } from './types';
 
-export function toggleAll(state: Todo[], completed: boolean): Todo[] {
-  throw new Error('toggleAll: not implemented');
+export function bulkAdd(todos: Todo[], newTodos: Todo[]): Todo[] {
+    return [...todos, ...newTodos];
 }
 
-export function clearCompleted(state: Todo[]): Todo[] {
-  throw new Error('clearCompleted: not implemented');
+export function bulkUpdateStatus(todos: Todo[], ids: number[], status: TodoStatus): Todo[] {
+    return todos.map(todo =>
+        ids.includes(todo.id) ? { ...todo, status } : todo
+    );
 }
 
-export function countByStatus(state: Todo[], status: TodoStatus): number {
-  throw new Error('countByStatus: not implemented');
+export function bulkRemove(todos: Todo[], ids: number[]): Todo[] {
+    return todos.filter(todo => !ids.includes(todo.id));
+}
+
+export function bulkCompleteAll(todos: Todo[]): Todo[] {
+    return todos.map(todo => ({
+        ...todo,
+        status: TodoStatus.COMPLETED
+    }));
+}
+
+export function filterByStatus(todos: Todo[], status: TodoStatus): Todo[] {
+    return todos.filter(todo => todo.status === status);
+}
+
+// Исправляем функции согласно тестам
+export function toggleAll(todos: Todo[], completed: boolean): Todo[] {
+    return todos.map(todo => ({
+        ...todo,
+        status: completed ? TodoStatus.COMPLETED : TodoStatus.PENDING
+    }));
+}
+
+export function clearCompleted(todos: Todo[]): Todo[] {
+    return todos.filter(todo => todo.status !== TodoStatus.COMPLETED);
+}
+
+export function countByStatus(todos: Todo[], status: TodoStatus): number {
+    return todos.filter(todo => todo.status === status).length;
 }

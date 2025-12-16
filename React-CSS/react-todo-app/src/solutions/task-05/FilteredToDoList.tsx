@@ -1,73 +1,151 @@
-import React, { useState } from 'react';
-import { Todo } from '../../types';
+﻿import React, { useState } from 'react';
 
-/**
- * Task 5: FilteredToDoList Component
- * 
- * Theory: Derived State and Computed Values
- * 
- * In React, you often need to compute values based on your state. These are called "derived state"
- * or "computed values" and should be calculated during render rather than stored in state.
- * 
- * Why Use Derived State:
- * 1. Avoids state synchronization issues
- * 2. Reduces complexity by having a single source of truth
- * 3. Automatically updates when source data changes
- * 4. Prevents stale state bugs
- * 
- * Common Derived State Patterns:
- * 
- * Filtering:
- * - const activeTodos = todos.filter(todo => !todo.completed)
- * - const completedTodos = todos.filter(todo => todo.completed)
- * 
- * Searching:
- * - const filteredTodos = todos.filter(todo => 
- *     todo.title.toLowerCase().includes(searchTerm.toLowerCase())
- *   )
- * 
- * Sorting:
- * - const sortedTodos = [...todos].sort((a, b) => a.title.localeCompare(b.title))
- * 
- * Aggregations:
- * - const completedCount = todos.filter(todo => todo.completed).length
- * - const totalCount = todos.length
- * 
- * Multiple Filters:
- * - Use multiple filter conditions or combine them
- * - Consider using useMemo for expensive computations
- * 
- * Key Concepts:
- * - Calculate derived values during render
- * - Don't store computed values in state
- * - Use useMemo for expensive calculations
- * - Keep state minimal and derive the rest
- */
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+type FilterType = 'all' | 'active' | 'completed';
+
 export const FilteredToDoList: React.FC = () => {
-  // TODO: Implement the FilteredToDoList component
-  // 
-  // Requirements:
-  // 1. Display a list of todos with add functionality
-  // 2. Add filter buttons: "All", "Active", "Completed"
-  // 3. Filter todos based on selected filter
-  // 4. Use derived state for filtered results
-  // 5. Add complete functionality for todos
-  // 
-  // Example implementation:
-  // const [todos, setTodos] = useState<Todo[]>([]);
-  // const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
-  // 
-  // const filteredTodos = todos.filter(todo => {
-  //   if (filter === 'active') return !todo.completed;
-  //   if (filter === 'completed') return todo.completed;
-  //   return true; // 'all' case
-  // });
+  const [inputValue, setInputValue] = useState('');
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, title: 'Learn React', completed: false },
+    { id: 2, title: 'Build Todo App', completed: true },
+    { id: 3, title: 'Write Tests', completed: false }
+  ]);
+  const [filter, setFilter] = useState<FilterType>('all');
+
+  const handleAdd = () => {
+    if (inputValue.trim() === '') return;
+
+    const newTodo: Todo = {
+      id: Date.now(),
+      title: inputValue.trim(),
+      completed: false
+    };
+
+    setTodos(prevTodos => [...prevTodos, newTodo]);
+    setInputValue('');
+  };
+
+  const handleComplete = (id: number) => {
+    setTodos(prevTodos =>
+      prevTodos.map(todo =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true; // 'all'
+  });
 
   return (
     <div>
-      {/* TODO: Replace this with your implementation */}
-      <h4>Filtered ToDo List Component</h4>
-      <p>Implement derived state and filtering here</p>
+      {/* Форма добавления */}
+      <div style={{ marginBottom: '20px' }}>
+        <input
+          type="text"
+          placeholder="Add todo"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          style={{ marginRight: '10px', padding: '5px', width: '200px' }}
+        />
+        <button
+          onClick={handleAdd}
+          style={{ padding: '5px 15px' }}
+        >
+          Add
+        </button>
+      </div>
+
+      {/* Кнопки фильтрации */}
+      <div style={{ marginBottom: '20px' }}>
+        <button
+          onClick={() => setFilter('all')}
+          style={{
+            marginRight: '10px',
+            padding: '5px 15px',
+            backgroundColor: filter === 'all' ? '#007bff' : '#f5f5f5',
+            color: filter === 'all' ? 'white' : '#333'
+          }}
+        >
+          All
+        </button>
+        <button
+          onClick={() => setFilter('active')}
+          style={{
+            marginRight: '10px',
+            padding: '5px 15px',
+            backgroundColor: filter === 'active' ? '#28a745' : '#f5f5f5',
+            color: filter === 'active' ? 'white' : '#333'
+          }}
+        >
+          Active
+        </button>
+        <button
+          onClick={() => setFilter('completed')}
+          style={{
+            padding: '5px 15px',
+            backgroundColor: filter === 'completed' ? '#6c757d' : '#f5f5f5',
+            color: filter === 'completed' ? 'white' : '#333'
+          }}
+        >
+          Completed
+        </button>
+      </div>
+
+      {/* Список задач */}
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {filteredTodos.map(todo => (
+          <li
+            key={todo.id}
+            style={{
+              margin: '10px 0',
+              padding: '10px',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: todo.completed ? '#e8f5e8' : '#fff'
+            }}
+          >
+            <span
+              style={{
+                textDecoration: todo.completed ? 'line-through' : 'none',
+                color: todo.completed ? '#666' : '#000',
+                flex: 1
+              }}
+            >
+              {todo.title}
+            </span>
+
+            <button
+              onClick={() => handleComplete(todo.id)}
+              style={{
+                padding: '5px 10px',
+                backgroundColor: todo.completed ? '#4caf50' : '#f5f5f5',
+                color: todo.completed ? 'white' : '#333',
+                border: '1px solid #ccc',
+                borderRadius: '3px',
+                cursor: 'pointer'
+              }}
+            >
+              {todo.completed ? 'Done' : 'Complete'}  {/* Изменено с Completed на Done */}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {/* Статистика */}
+      <div style={{ marginTop: '20px', color: '#666' }}>
+        Total: {todos.length} | Not done: {todos.filter(t => !t.completed).length} | Done: {todos.filter(t => t.completed).length}
+      </div>
     </div>
   );
-}; 
+};

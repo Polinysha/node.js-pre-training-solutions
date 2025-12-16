@@ -1,18 +1,53 @@
+import { Todo, TodoStatus } from './types';
 import { TodoApi } from './todo-api';
-import { Todo } from './types';
 
 export class TodoService {
-  constructor(private readonly api: TodoApi) { }
+    private api: TodoApi;
 
-  async create(title: string, description = ''): Promise<Todo> {
-    throw new Error('create: not implemented');
-  }
+    constructor(api: TodoApi) {
+        this.api = api;
+    }
 
-  async toggleStatus(id: number): Promise<Todo> {
-    throw new Error('toggleStatus: not implemented');
-  }
+    async create(title: string, description = ''): Promise<Todo> {
+        return await this.api.add({
+            title,
+            description,
+            status: TodoStatus.PENDING
+        });
+    }
 
-  async search(keyword: string): Promise<Todo[]> {
-    throw new Error('search: not implemented');
-  }
+    async toggleStatus(id: number): Promise<Todo> {
+        // Получаем текущую задачу
+        const currentTodo = await this.api.get(id);
+        if (!currentTodo) {
+            throw new Error(`Todo with id ${id} not found`);
+        }
+
+        // Определяем новый статус
+        const newStatus = currentTodo.status === TodoStatus.COMPLETED 
+            ? TodoStatus.PENDING 
+            : TodoStatus.COMPLETED;
+
+        // Обновляем задачу
+        const updatedTodo = await this.api.update(id, { status: newStatus });
+        if (!updatedTodo) {
+            throw new Error(`Failed to update todo with id ${id}`);
+        }
+
+        return updatedTodo;
+    }
+
+    async search(keyword: string): Promise<Todo[]> {
+        const allTodos = await this.api.getAll();
+        const lowerKeyword = keyword.toLowerCase();
+        
+        return allTodos.filter(todo =>
+            todo.title.toLowerCase().includes(lowerKeyword) ||
+            todo.description?.toLowerCase().includes(lowerKeyword)
+        );
+    }
+
+    async getAll(): Promise<Todo[]> {
+        return await this.api.getAll();
+    }
 }

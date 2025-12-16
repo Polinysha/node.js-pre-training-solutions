@@ -12,6 +12,11 @@ interface Todo {
     readonly createdAt: Date;
 }
 
-type NewTodo = Omit<Todo, 'id' | 'createdAt'>;
+// Status должен быть опциональным для NewTodo
+type NewTodo = {
+    title: string;
+    description?: string;
+    status?: TodoStatus;
+};
 
 export { TodoStatus, Todo, NewTodo };

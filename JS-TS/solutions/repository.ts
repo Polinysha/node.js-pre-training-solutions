@@ -1,24 +1,38 @@
-export class InMemoryRepository<T extends { id: number }> {
-  // private storage
-  private items: T[] = [];
+export interface Repository<T> {
+    add(entity: T): T;
+    update(id: number, patch: Partial<T>): T;
+    remove(id: number): void;
+    findById(id: number): T | undefined;
+    findAll(): T[];
+}
 
-  add(entity: T): T {
-    throw new Error('add: not implemented');
-  }
+export class InMemoryRepository<T extends { id: number }> implements Repository<T> {
+    private entities: T[] = [];
 
-  update(id: number, patch: Partial<T>): T {
-    throw new Error('update: not implemented');
-  }
+    add(entity: T): T {
+        this.entities.push(entity);
+        return entity;
+    }
 
-  remove(id: number): void {
-    throw new Error('remove: not implemented');
-  }
+    update(id: number, patch: Partial<T>): T {
+        const index = this.entities.findIndex(entity => entity.id === id);
+        if (index === -1) {
+            throw new Error(`Entity with id ${id} not found`);
+        }
+        
+        this.entities[index] = { ...this.entities[index], ...patch };
+        return this.entities[index];
+    }
 
-  findById(id: number): T | undefined {
-    throw new Error('findById: not implemented');
-  }
+    remove(id: number): void {
+        this.entities = this.entities.filter(entity => entity.id !== id);
+    }
 
-  findAll(): T[] {
-    throw new Error('findAll: not implemented');
-  }
+    findById(id: number): T | undefined {
+        return this.entities.find(entity => entity.id === id);
+    }
+
+    findAll(): T[] {
+        return [...this.entities];
+    }
 }

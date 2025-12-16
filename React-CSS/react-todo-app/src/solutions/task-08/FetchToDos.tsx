@@ -1,99 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { Todo } from '../../types';
+﻿import React, { useState, useEffect } from 'react';
 
-/**
- * Task 8: FetchToDos Component
- * 
- * Theory: React Hooks - useEffect and Side Effects
- * 
- * useEffect is a React Hook that lets you perform side effects in function components.
- * Side effects are operations that happen outside of the normal render cycle, such as:
- * - Data fetching
- * - Subscriptions
- * - Manual DOM manipulations
- * - Timers
- * 
- * useEffect Hook Structure:
- * useEffect(() => {
- *   // Side effect code
- *   return () => {
- *     // Cleanup code (optional)
- *   };
- * }, [dependencies]);
- * 
- * useEffect Dependencies:
- * 
- * Empty Array []:
- * - Runs only once after initial render
- * - Good for one-time setup (fetching initial data)
- * - Example: useEffect(() => fetchData(), [])
- * 
- * No Dependencies:
- * - Runs after every render
- * - Usually not what you want
- * - Can cause infinite loops
- * 
- * With Dependencies [dep1, dep2]:
- * - Runs when dependencies change
- * - Good for reactive effects
- * - Example: useEffect(() => fetchData(id), [id])
- * 
- * Data Fetching Patterns:
- * 
- * 1. Loading States:
- *    - Track loading state with useState
- *    - Show loading indicator while fetching
- *    - Handle errors gracefully
- * 
- * 2. Error Handling:
- *    - Catch and handle fetch errors
- *    - Display user-friendly error messages
- *    - Provide retry mechanisms
- * 
- * 3. Cleanup:
- *    - Cancel requests if component unmounts
- *    - Clear timers and subscriptions
- *    - Prevent memory leaks
- * 
- * Key Concepts:
- * - useEffect runs after render
- * - Always consider cleanup for side effects
- * - Use dependencies array to control when effect runs
- * - Handle loading and error states
- */
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
 export const FetchToDos: React.FC = () => {
-  // TODO: Implement the FetchToDos component
-  // 
-  // Requirements:
-  // 1. Fetch todos from an API endpoint
-  // 2. Display loading state while fetching
-  // 3. Handle and display any errors
-  // 4. Show the fetched todos in a list
-  // 5. Use useEffect for data fetching
-  // 
-  // Example implementation:
-  // const [todos, setTodos] = useState<Todo[]>([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
-  // 
-  // useEffect(() => {
-  //   fetch('https://jsonplaceholder.typicode.com/todos')
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       setTodos(data.slice(0, 5)); // Limit to 5 todos
-  //       setLoading(false);
-  //     })
-  //     .catch(err => {
-  //       setError(err.message);
-  //       setLoading(false);
-  //     });
-  // }, []);
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        // Имитация API запроса
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Моковые данные
+        const mockData: Todo[] = [
+          { id: 1, title: 'Buy milk', completed: false },
+          { id: 2, title: 'Walk the dog', completed: true },
+          { id: 3, title: 'Learn React', completed: false }
+        ];
+        
+        setTodos(mockData);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch todos');
+        setLoading(false);
+      }
+    };
+
+    fetchTodos();
+  }, []); // Пустой массив зависимостей = выполняется только при монтировании
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
-      {/* TODO: Replace this with your implementation */}
-      <h4>Fetch ToDos Component</h4>
-      <p>Implement data fetching with useEffect here</p>
+      <h3>Fetched ToDos</h3>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {todos.map(todo => (
+          <li 
+            key={todo.id}
+            style={{
+              padding: '10px',
+              margin: '5px 0',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              textDecoration: todo.completed ? 'line-through' : 'none',
+              color: todo.completed ? '#666' : '#000'
+            }}
+          >
+            {todo.title}
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}; 
+};

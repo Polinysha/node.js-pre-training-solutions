@@ -1,58 +1,78 @@
-import React, { useState } from 'react';
-import { Todo } from '../../types';
+﻿import React, { useState } from 'react';
 
-/**
- * Task 3: AddToDo Component
- * 
- * Theory: React Hooks - useState
- * 
- * React Hooks are functions that allow you to "hook into" React state and lifecycle features
- * from function components. useState is the most fundamental hook for managing component state.
- * 
- * useState Hook:
- * - Returns an array with two elements: [state, setState]
- * - First element is the current state value
- * - Second element is a function to update the state
- * - State updates trigger component re-renders
- * 
- * State Management Best Practices:
- * 1. Never modify state directly (mutate the state object)
- * 2. Always use the setter function provided by useState
- * 3. State updates are asynchronous
- * 4. React batches state updates for performance
- * 5. Use functional updates when new state depends on previous state
- * 
- * Event Handling in React:
- * - Use camelCase for event handlers (onClick, onChange, onSubmit)
- * - Event handlers receive a synthetic event object
- * - Prevent default behavior with event.preventDefault()
- * - Access input values through event.target.value
- * 
- * Key Concepts:
- * - State is component-specific and isolated
- * - State changes cause re-renders
- * - Use controlled components for form inputs
- * - Handle form submission properly
- */
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
 export const AddToDo: React.FC = () => {
-  // TODO: Implement the AddToDo component
-  // 
-  // Requirements:
-  // 1. Create a controlled input field for todo title
-  // 2. Add a button to submit the new todo
-  // 3. Handle form submission (prevent default behavior)
-  // 4. Clear the input after adding a todo
-  // 5. Don't add empty todos
-  // 
-  // Example implementation:
-  // const [inputValue, setInputValue] = useState('');
-  // const [todos, setTodos] = useState<Todo[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, title: 'Learn React', completed: false },
+    { id: 2, title: 'Build Todo App', completed: false }
+  ]);
+
+  const handleAdd = () => {
+    if (inputValue.trim() === '') return;
+
+    const newTodo: Todo = {
+      id: Date.now(),
+      title: inputValue.trim(),
+      completed: false
+    };
+
+    setTodos(prevTodos => [...prevTodos, newTodo]);
+    setInputValue('');
+  };
 
   return (
     <div>
-      {/* TODO: Replace this with your implementation */}
-      <h4>Add ToDo Component</h4>
-      <p>Implement useState and form handling here</p>
+      <div style={{ marginBottom: '20px' }}>
+        <input
+          type="text"
+          placeholder="Add todo"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          style={{ 
+            marginRight: '10px', 
+            padding: '8px',
+            width: '200px',
+            border: '1px solid #ccc',
+            borderRadius: '4px'
+          }}
+        />
+        <button
+          onClick={handleAdd}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Add
+        </button>
+      </div>
+
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {todos.map(todo => (
+          <li
+            key={todo.id}
+            style={{
+              padding: '10px',
+              margin: '5px 0',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              backgroundColor: '#f9f9f9'
+            }}
+          >
+            {todo.title}
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}; 
+};
