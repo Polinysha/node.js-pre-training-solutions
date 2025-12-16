@@ -1,3 +1,4 @@
+//7
 export interface Repository<T> {
     add(entity: T): T;
     update(id: number, patch: Partial<T>): T;
@@ -19,13 +20,18 @@ export class InMemoryRepository<T extends { id: number }> implements Repository<
         if (index === -1) {
             throw new Error(`Entity with id ${id} not found`);
         }
-        
+
         this.entities[index] = { ...this.entities[index], ...patch };
         return this.entities[index];
     }
 
     remove(id: number): void {
-        this.entities = this.entities.filter(entity => entity.id !== id);
+        const index = this.entities.findIndex(entity => entity.id === id);
+        if (index === -1) {
+            throw new Error(`Entity with id ${id} not found`);
+        }
+        
+        this.entities.splice(index, 1);
     }
 
     findById(id: number): T | undefined {

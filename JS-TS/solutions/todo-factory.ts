@@ -1,3 +1,4 @@
+//3
 import { Todo, NewTodo, TodoStatus } from './types';
 
 let nextId = 1;
@@ -10,6 +11,6 @@ export function createTodo(input: NewTodo): Todo {
         status: input.status || TodoStatus.PENDING,
         createdAt: new Date()
     };
-    
+
     return todo;
 }

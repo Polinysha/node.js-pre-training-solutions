@@ -1,3 +1,4 @@
+// solutions/array-helpers.ts
 export function mapArray<T, R>(source: readonly T[], mapper: (item: T, index: number) => R): R[] {
     if (source == null) throw new TypeError('Source is null or undefined');
 

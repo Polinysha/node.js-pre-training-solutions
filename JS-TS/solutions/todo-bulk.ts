@@ -1,3 +1,4 @@
+//5
 import { Todo, TodoStatus } from './types';
 
 export function bulkAdd(todos: Todo[], newTodos: Todo[]): Todo[] {
@@ -14,18 +15,6 @@ export function bulkRemove(todos: Todo[], ids: number[]): Todo[] {
     return todos.filter(todo => !ids.includes(todo.id));
 }
 
-export function bulkCompleteAll(todos: Todo[]): Todo[] {
-    return todos.map(todo => ({
-        ...todo,
-        status: TodoStatus.COMPLETED
-    }));
-}
-
-export function filterByStatus(todos: Todo[], status: TodoStatus): Todo[] {
-    return todos.filter(todo => todo.status === status);
-}
-
-// Исправляем функции согласно тестам
 export function toggleAll(todos: Todo[], completed: boolean): Todo[] {
     return todos.map(todo => ({
         ...todo,
