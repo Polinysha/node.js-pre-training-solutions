@@ -1,13 +1,10 @@
-// Express.js app with GET /todos/:id endpoint
 const express = require('express');
 const app = express();
 
-// Õğàíèëèùå todos â ïàìÿòè (òîëüêî òî ÷òî íóæíî)
 let todos = [
   { id: 1, title: 'Buy milk', completed: false }
 ];
 
-// GET /todos/:id endpoint (Task 04) - ÒÎ×ÍÎ ÏÎ ÇÀÄÀÍÈŞ
 app.get('/todos/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const todo = todos.find((t) => t.id === id);
