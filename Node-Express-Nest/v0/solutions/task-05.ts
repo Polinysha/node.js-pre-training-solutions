@@ -5,6 +5,9 @@ import { Controller, Get } from '@nestjs/common';
 export class TodosController {
   @Get()
   getTodos() {
-    // TODO: implement
+    // ТОЧНО как в примере задания: возвращает массив todos
+    return [
+      { id: 1, title: 'Buy milk', completed: false }
+    ];
   }
-} 
+}
