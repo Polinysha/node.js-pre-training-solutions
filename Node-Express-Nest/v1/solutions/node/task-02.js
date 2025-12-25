@@ -1,181 +1,271 @@
 const fs = require("fs");
 const { Transform } = require("stream");
 const { pipeline } = require("stream/promises");
+const path = require("path");
 
 class CSVParser extends Transform {
   constructor(options = {}) {
     super({ objectMode: true });
-    // TODO: Initialize properties
-    // - this.headers = null;
-    // - this.lineNumber = 0;
-    // - this.buffer = '';
+    this.headers = null;
+    this.lineNumber = 0;
+    this.buffer = '';
+    this.delimiter = options.delimiter || ',';
   }
 
   _transform(chunk, encoding, callback) {
-    // TODO: Implement CSV parsing
-    // 1. Convert chunk to string and add to buffer
-    // 2. Split buffer by newlines
-    // 3. Keep last incomplete line in buffer
-    // 4. Process complete lines:
-    //    - First line: extract headers
-    //    - Other lines: create objects with headers as keys
-    // 5. Push objects to next stream
+    this.buffer += chunk.toString();
+    const lines = this.buffer.split('\n');
+    this.buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      this.lineNumber++;
+      if (line.trim() === '') continue;
+
+      if (this.lineNumber === 1) {
+        this.headers = line.split(this.delimiter).map(h => h.trim());
+      } else {
+        const values = line.split(this.delimiter).map(v => v.trim());
+        const record = {};
+        
+        for (let i = 0; i < this.headers.length; i++) {
+          record[this.headers[i]] = i < values.length ? values[i] : '';
+        }
+        
+        this.push(record);
+      }
+    }
 
     callback();
   }
 
   _flush(callback) {
-    // TODO: Process any remaining data in buffer
+    if (this.buffer.trim() !== '' && this.headers) {
+      const values = this.buffer.split(this.delimiter).map(v => v.trim());
+      const record = {};
+      
+      for (let i = 0; i < this.headers.length; i++) {
+        record[this.headers[i]] = i < values.length ? values[i] : '';
+      }
+      
+      this.push(record);
+    }
     callback();
   }
 }
 
-/**
- * Data Transformer Stream
- * Applies transformations to each record
- */
 class DataTransformer extends Transform {
   constructor(options = {}) {
     super({ objectMode: true });
   }
 
   _transform(record, encoding, callback) {
-    // TODO: Apply transformations to record
-    // 1. Capitalize name using capitalizeName()
-    // 2. Normalize email using normalizeEmail()
-    // 3. Format phone using formatPhone()
-    // 4. Standardize date using standardizeDate()
-    // 5. Capitalize city name
-    // 6. Push transformed record
+    const transformed = {
+      name: capitalizeName(record.name || ''),
+      email: normalizeEmail(record.email || ''),
+      phone: formatPhone(record.phone || ''),
+      birthdate: standardizeDate(record.birthdate || ''),
+      city: capitalizeName(record.city || '')
+    };
 
+    this.push(transformed);
     callback();
   }
 }
 
-/**
- * CSV Writer Transform Stream
- * Converts objects back to CSV format
- */
 class CSVWriter extends Transform {
   constructor(options = {}) {
     super({ objectMode: true });
-    // TODO: Initialize properties
-    // - this.headerWritten = false;
+    this.headerWritten = false;
+    this.headers = ['name', 'email', 'phone', 'birthdate', 'city'];
+    this.delimiter = options.delimiter || ',';
   }
 
   _transform(record, encoding, callback) {
-    // TODO: Convert object to CSV format
-    // 1. Write headers on first record
-    // 2. Convert record values to CSV line
-    // 3. Handle special characters and quotes
-    // 4. Push CSV line as string
+    if (!this.headerWritten) {
+      this.push(this.headers.join(this.delimiter) + '\n');
+      this.headerWritten = true;
+    }
 
+    const line = this.headers
+      .map(header => {
+        const value = record[header] || '';
+        if (value.includes(this.delimiter) || value.includes('"') || value.includes('\n')) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      })
+      .join(this.delimiter);
+
+    this.push(line + '\n');
     callback();
   }
 }
 
-/**
- * Helper Functions
- */
-
-/**
- * Capitalize names properly
- * @param {string} name - Name to capitalize
- * @returns {string} Capitalized name
- */
 function capitalizeName(name) {
-  // TODO: Implement name capitalization
-  // 1. Handle empty/null names
-  // 2. Split by spaces and hyphens
-  // 3. Capitalize each part
-  // 4. Join back together
-  // Examples:
-  // "john doe" → "John Doe"
-  // "mary-jane smith" → "Mary-Jane Smith"
-
-  return name;
+  if (!name) return '';
+  
+  return name
+    .split(' ')
+    .map(part =>
+      part
+        .split('-')
+        .map(subPart =>
+          subPart.charAt(0).toUpperCase() + subPart.slice(1).toLowerCase()
+        )
+        .join('-')
+    )
+    .join(' ');
 }
 
-/**
- * Normalize email addresses
- * @param {string} email - Email to normalize
- * @returns {string} Normalized email or original if invalid
- */
 function normalizeEmail(email) {
-  // TODO: Implement email normalization
-  // 1. Convert to lowercase
-  // 2. Validate basic email format (contains @ and .)
-  // 3. Return normalized email or original if invalid
-
-  return email;
+  if (!email) return '';
+  
+  const normalized = email.toLowerCase().trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+  return emailRegex.test(normalized) ? normalized : email;
 }
 
-/**
- * Format phone numbers
- * @param {string} phone - Phone number to format
- * @returns {string} Formatted phone or "INVALID"
- */
 function formatPhone(phone) {
-  // TODO: Implement phone formatting
-  // 1. Extract only digits
-  // 2. Check if exactly 10 digits
-  // 3. Format as (XXX) XXX-XXXX
-  // 4. Return "INVALID" if not valid
-
-  return phone;
+  if (!phone) return 'INVALID';
+  
+  const digits = phone.replace(/\D/g, '');
+  
+  if (digits.length === 10) {
+    const areaCode = digits.substring(0, 3);
+    const prefix = digits.substring(3, 6);
+    const lineNumber = digits.substring(6, 10);
+    return `(${areaCode}) ${prefix}-${lineNumber}`;
+  }
+  
+  return 'INVALID';
 }
 
-/**
- * Standardize date formats
- * @param {string} date - Date to standardize
- * @returns {string} Date in YYYY-MM-DD format
- */
 function standardizeDate(date) {
-  // TODO: Implement date standardization
-  // 1. Handle different input formats:
-  //    - MM/DD/YYYY
-  //    - YYYY-MM-DD
-  //    - YYYY/MM/DD
-  // 2. Convert to YYYY-MM-DD format
-  // 3. Validate date is real
-  // 4. Return original if invalid
-
-  return date;
+  if (!date || typeof date !== 'string') return '';
+  
+  const trimmedDate = date.trim();
+  if (trimmedDate === '') return '';
+  
+  let year, month, day;
+  
+  if (trimmedDate.includes('/')) {
+    const parts = trimmedDate.split('/');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        [year, month, day] = parts;
+      } else if (parts[2].length === 4) {
+        [month, day, year] = parts;
+      } else if (parts[2].length === 2) {
+        [month, day, year] = parts;
+        if (year.length === 2) {
+          year = parseInt(year, 10) > 50 ? '19' + year : '20' + year;
+        }
+      }
+    }
+  } else if (trimmedDate.includes('-')) {
+    const parts = trimmedDate.split('-');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        [year, month, day] = parts;
+      } else if (parts[2].length === 4) {
+        [day, month, year] = parts;
+      }
+    }
+  } else {
+    return trimmedDate;
+  }
+  
+  if (!year || !month || !day) {
+    return trimmedDate;
+  }
+  
+  if (year.length === 2) {
+    year = parseInt(year, 10) > 50 ? '19' + year : '20' + year;
+  }
+  
+  month = month.padStart(2, '0');
+  day = day.padStart(2, '0');
+  
+  const monthNum = parseInt(month, 10);
+  const dayNum = parseInt(day, 10);
+  
+  if (monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31) {
+    return trimmedDate;
+  }
+  
+  return `${year}-${month}-${day}`;
 }
 
-/**
- * Main function to process CSV file
- * @param {string} inputPath - Path to input CSV file
- * @param {string} outputPath - Path to output CSV file
- * @returns {Promise} Promise that resolves when processing is complete
- */
 async function processCSVFile(inputPath, outputPath) {
-  // TODO: Implement the main processing pipeline
-  // 1. Create read stream from input file
-  // 2. Create transform streams (CSVParser, DataTransformer, CSVWriter)
-  // 3. Create write stream to output file
-  // 4. Use pipeline() to connect all streams
-  // 5. Handle errors appropriately
-  // 6. Return promise that resolves when complete
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!fs.existsSync(inputPath)) {
+        throw new Error(`Input file not found: ${inputPath}`);
+      }
+      
+      const outputDir = path.dirname(outputPath);
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+      
+      const readStream = fs.createReadStream(inputPath, { 
+        encoding: 'utf8',
+        highWaterMark: 64 * 1024
+      });
+      
+      const writeStream = fs.createWriteStream(outputPath, { 
+        encoding: 'utf8'
+      });
+      
+      readStream.on('error', (error) => {
+        reject(new Error(`Failed to read input file: ${error.message}`));
+      });
+      
+      writeStream.on('error', (error) => {
+        reject(new Error(`Failed to write output file: ${error.message}`));
+      });
+      
+      await pipeline(
+        readStream,
+        new CSVParser(),
+        new DataTransformer(),
+        new CSVWriter(),
+        writeStream
+      );
+      
+      resolve();
+      
+    } catch (error) {
+      reject(new Error(`Failed to process CSV file: ${error.message}`));
+    }
+  });
+}
 
+function createSampleData() {
+  const dataDir = path.join(__dirname, 'data');
+  
   try {
-    // Implementation goes here
-    console.log("CSV processing not implemented yet");
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    
+    const sampleData = `name,email,phone,birthdate,city
+john doe,JOHN.DOE@EXAMPLE.COM,1234567890,12/25/1990,new york
+jane smith,Jane.Smith@Gmail.Com,555-123-4567,1985-03-15,los angeles
+bob johnson,BOB@TEST.COM,invalid-phone,03/22/1992,chicago
+alice brown,alice.brown@company.org,9876543210,1988/07/04,houston`;
+    
+    const inputPath = path.join(dataDir, 'users.csv');
+    fs.writeFileSync(inputPath, sampleData, 'utf8');
+    
+    return inputPath;
+    
   } catch (error) {
-    throw new Error(`Failed to process CSV file: ${error.message}`);
+    throw new Error(`Failed to create sample data: ${error.message}`);
   }
 }
 
-/**
- * Create sample input data for testing
- */
-function createSampleData() {
-  // TODO: Create data directory and sample CSV file
-  // 1. Create 'data' directory if it doesn't exist
-  // 2. Write sample CSV data as specified in task description
-}
-
-// Export classes and functions
 module.exports = {
   CSVParser,
   DataTransformer,
@@ -188,24 +278,20 @@ module.exports = {
   createSampleData,
 };
 
-// Example usage (for testing):
-const isReadyToTest = false;
-
-if (isReadyToTest) {
-  // Create sample data
-  createSampleData();
-
-  // Process the file
-  processCSVFile("data/users.csv", "data/users_transformed.csv")
-    .then(() => {
-      console.log("✅ File transformation completed successfully!");
-
-      // Read and display results
-      const output = fs.readFileSync("data/users_transformed.csv", "utf-8");
-      console.log("\n📄 Transformed CSV output:");
+if (require.main === module) {
+  (async () => {
+    try {
+      const inputPath = createSampleData();
+      const outputPath = path.join(path.dirname(inputPath), 'users_transformed.csv');
+      
+      await processCSVFile(inputPath, outputPath);
+      
+      const output = fs.readFileSync(outputPath, 'utf8');
       console.log(output);
-    })
-    .catch((error) => {
-      console.error("❌ Error processing file:", error.message);
-    });
+      
+    } catch (error) {
+      console.error('Error:', error.message);
+      process.exit(1);
+    }
+  })();
 }
