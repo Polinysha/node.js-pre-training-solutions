@@ -1,15 +1,15 @@
-import { Todo, NewTodo, TodoStatus } from './types.js';
+﻿import { Todo, NewTodo, TodoStatus } from './types';
 
-let nextId = 1;
+let idCounter = 1;
 
-export function createTodo(input: NewTodo): Todo {
-    const todo: Todo = {
-        id: nextId++,
-        title: input.title,
-        description: input.description,
-        status: input.status || TodoStatus.PENDING,
+export const createTodo = (todo: NewTodo): Todo => {
+    const newTodo: Todo = {
+        id: idCounter++,
+        title: todo.title,
+        description: todo.description,
+        status: todo.status || TodoStatus.PENDING,
         createdAt: new Date()
     };
     
-    return todo;
-}
+    return newTodo;
+};

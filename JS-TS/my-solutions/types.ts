@@ -1,4 +1,4 @@
-enum TodoStatus {
+﻿enum TodoStatus {
     PENDING = 'PENDING',
     IN_PROGRESS = 'IN_PROGRESS',
     COMPLETED = 'COMPLETED'
@@ -12,6 +12,8 @@ interface Todo {
     readonly createdAt: Date;
 }
 
-type NewTodo = Omit<Todo, 'id' | 'createdAt'>;
+type NewTodo = Omit<Todo, 'id' | 'createdAt'> & {
+    status?: TodoStatus;
+};
 
 export { TodoStatus, Todo, NewTodo };
