@@ -1,0 +1,15 @@
+Task 01: Custom Event Emitter — MessagingSystem
+
+Описание реализации:
+- Класс MessagingSystem наследуется от EventEmitter
+- Хранит активных пользователей в Set
+- Хранит историю сообщений (массив, max 10 элементов, FIFO)
+- Поддерживает типы: message, notification, alert
+- Emit событий: 'message' (все), 'user-joined', 'user-left', 'alert', 'notification', конкретный type
+- Методы реализованы согласно требованиям: sendMessage, subscribeToMessages, subscribeToType, addUser/removeUser, getActiveUsers, getUserCount, getMessageHistory, clearHistory, getStats
+
+Как запустить:
+cd solutions/node/task-01
+node index.js
+
+Файл реализации: index.js

@@ -1,0 +1,28 @@
+﻿Task 3: Centralized Error Handler
+===================================
+
+Objective: Throw errors from routes and handle them using a custom error middleware.
+Format the output as { status, message, timestamp }.
+
+Implementation:
+1. Custom error classes (AppError, NotFoundError, ValidationError, UnauthorizedError)
+2. Global error handling middleware
+3. Consistent error response format
+4. Request logging middleware
+
+Key Features:
+- Custom error hierarchy
+- Centralized error handling
+- Request logging for debugging
+- Consistent error response structure
+
+To run: node task-03.js
+Server runs on: http://localhost:3002
+
+Test commands:
+curl http://localhost:3002/users
+curl http://localhost:3002/users/999
+curl http://localhost:3002/error?type=validation
+curl -X POST http://localhost:3002/users -H "Content-Type: application/json" -d '{"invalid":"data"}'
+
+Expected output shows standardized error format.

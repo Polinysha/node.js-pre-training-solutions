@@ -28,12 +28,12 @@ class StrictEventLoopTester {
    */
   async runTest(name, testFunction) {
     try {
-      console.log(`🧪 Running: ${name}`);
+      console.log(` Running: ${name}`);
       await testFunction();
-      console.log(`✅ Passed: ${name}`);
+      console.log(` Passed: ${name}`);
       this.testResults.push({ name, status: "PASS" });
     } catch (error) {
-      console.log(`❌ Failed: ${name} - ${error.message}`);
+      console.log(` Failed: ${name} - ${error.message}`);
       this.testResults.push({ name, status: "FAIL", error: error.message });
     }
   }
@@ -60,7 +60,7 @@ class StrictEventLoopTester {
         notifications: true,
       }),
       "activity-123.json": JSON.stringify({
-        lastLogin: "2025-01-01",
+        lastLogin: "2026-01-01",
         sessionsCount: 15,
         totalTime: 3600,
       }),
@@ -474,8 +474,8 @@ class StrictEventLoopTester {
 
       // Check for enhanced formatting beyond basic brackets
       const hasEnhancedFormatting =
-        logOutput.includes("🕐") ||
-        logOutput.includes("⏰") ||
+        logOutput.includes("TM") ||
+        logOutput.includes("VR") ||
         logOutput.includes(">>>") ||
         logOutput.includes("Phase:") ||
         logOutput.includes("|") ||
@@ -624,27 +624,27 @@ class StrictEventLoopTester {
    * Print test results summary
    */
   printResults() {
-    console.log("\n📊 STRICT Test Results:");
+    console.log("\n STRICT Test Results:");
     console.log("========================");
 
     const passed = this.testResults.filter((r) => r.status === "PASS").length;
     const failed = this.testResults.filter((r) => r.status === "FAIL").length;
 
-    console.log(`✅ Passed: ${passed}`);
-    console.log(`❌ Failed: ${failed}`);
+    console.log(` Passed: ${passed}`);
+    console.log(` Failed: ${failed}`);
     console.log(
-      `📈 Success Rate: ${Math.round(
+      ` Success Rate: ${Math.round(
         (passed / this.testResults.length) * 100
       )}%`
     );
 
     if (failed > 0) {
-      console.log("\n❌ Failed Tests (Implementation Required):");
+      console.log("\n Failed Tests (Implementation Required):");
       this.testResults
         .filter((r) => r.status === "FAIL")
         .forEach((r) => console.log(`  - ${r.name}:\n    ${r.error}`));
 
-      console.log("\n💡 Next Steps:");
+      console.log("\n Next Steps:");
       console.log("   1. Replace TODO comments with actual implementation");
       console.log(
         "   2. Implement each function according to the task requirements"
@@ -654,22 +654,22 @@ class StrictEventLoopTester {
     }
 
     if (failed === 0) {
-      console.log("\n🎉 All STRICT tests passed!");
+      console.log("\n All STRICT tests passed!");
       console.log(
-        "🌟 Excellent! Your Event Loop & Async Debugging implementation is fully working!"
+        " Excellent! Your Event Loop & Async Debugging implementation is fully working!"
       );
-      console.log("\n💡 Advanced challenges:");
+      console.log("\n Advanced challenges:");
       console.log("   - Add performance monitoring to event loop analysis");
       console.log("   - Create visual timeline of async operations");
       console.log("   - Implement custom event loop debugger");
       console.log("   - Add memory usage tracking for async operations");
     } else {
-      console.log("\n🔧 Keep working on your implementation!");
+      console.log("\n Keep working on your implementation!");
       console.log(
-        "💭 Remember: The basic test file (task-03-test.js) provides guidance"
+        " Remember: The basic test file (task-03-test.js) provides guidance"
       );
       console.log(
-        "⚡ This strict test validates that your code actually works"
+        " This strict test validates that your code actually works"
       );
     }
   }
@@ -683,23 +683,23 @@ async function runStrictTests() {
     const tester = new StrictEventLoopTester();
     await tester.runAllTests();
   } catch (error) {
-    console.error("❌ Strict test setup failed:", error.message);
+    console.error(" Strict test setup failed:", error.message);
     console.log(
-      "\n💡 Make sure you have implemented all required functionality in task-03.js"
+      "\n Make sure you have implemented all required functionality in task-03.js"
     );
     console.log(
-      "🔍 These tests require actual working code, not just TODO comments"
+      " These tests require actual working code, not just TODO comments"
     );
   }
 }
 
 // Run tests if this file is executed directly
 if (require.main === module) {
-  console.log("🧪 STRICT Event Loop & Async Debugging Test Suite");
+  console.log(" STRICT Event Loop & Async Debugging Test Suite");
   console.log("==================================================");
-  console.log("⚠️  WARNING: These tests require actual implementation!");
-  console.log("📝 Use task-03-test.js for educational guidance");
-  console.log("✅ Use this file to validate your final implementation\n");
+  console.log("  WARNING: These tests require actual implementation!");
+  console.log(" Use task-03-test.js for educational guidance");
+  console.log(" Use this file to validate your final implementation\n");
   runStrictTests();
 }
 

@@ -1,0 +1,27 @@
+﻿Task 1: Middleware Playground
+===============================
+
+Objective: Create and register middlewares: logger, timer, custom header injector.
+Log the sequence of execution for each request.
+
+Implementation:
+1. Logger Middleware - logs request details with timestamps
+2. Timer Middleware - measures response time
+3. Custom Header Middleware - injects custom headers
+4. Shows middleware execution order
+
+Key Features:
+- Request logging with unique IDs
+- Response time tracking
+- Custom headers injection
+- Clear demonstration of middleware chain
+
+To run: node task-01.js
+Server runs on: http://localhost:3000
+
+Test commands:
+curl http://localhost:3000/
+curl http://localhost:3000/api/users
+curl -X POST http://localhost:3000/api/users -H "Content-Type: application/json" -d '{"name":"John"}'
+
+Expected output shows middleware execution sequence.

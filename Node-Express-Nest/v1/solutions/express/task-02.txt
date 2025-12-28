@@ -1,0 +1,29 @@
+﻿Task 2: Params and Queries Challenge with Validation
+=====================================================
+
+Objective: Create a route `/users/:id?active=true`
+- Extract both req.params and req.query
+- Validate: id must be a number, active must be "true" or "false"
+- Return message like: "User 42 is active"
+
+Implementation:
+1. Express-validator for input validation
+2. Param validation: id must be positive integer
+3. Query validation: active must be boolean string
+4. Advanced filtering, pagination, and sorting
+
+Key Features:
+- Comprehensive validation with express-validator
+- Filtering by active status
+- Field selection with ?fields=name,email
+- Pagination with limit and page parameters
+
+To run: node task-02.js
+Server runs on: http://localhost:3001
+
+Test commands:
+curl http://localhost:3001/users/1?active=true
+curl http://localhost:3001/users/2?active=false&fields=name,email
+curl http://localhost:3001/users?active=true&search=alice&sort=name&limit=5&page=1
+
+Expected response includes validation and filtering results.

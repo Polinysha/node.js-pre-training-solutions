@@ -1,0 +1,32 @@
+﻿Task 4: Wire Up ToDo REST API
+==================================
+
+Objective: Use Express to serve the ToDo endpoints.
+Import shared todoService logic from Node phase.
+Add middleware for request validation.
+
+Implementation:
+1. Full CRUD operations for todos
+2. Request validation middleware
+3. Search and filtering capabilities
+4. Todo statistics endpoint
+5. TodoService class with in-memory storage
+
+Key Features:
+- Create, Read, Update, Delete todos
+- Search by title/description
+- Filter by completion status
+- Todo statistics (total, completed, pending)
+- Request validation for title field
+
+To run: node task-04.js
+Server runs on: http://localhost:3003
+
+Test commands:
+curl http://localhost:3003/todos
+curl -X POST http://localhost:3003/todos -H "Content-Type: application/json" -d '{"title":"Learn Express"}'
+curl http://localhost:3003/todos/1
+curl -X PUT http://localhost:3003/todos/1 -H "Content-Type: application/json" -d '{"title":"Updated","completed":true}'
+curl http://localhost:3003/todos/stats
+
+Expected output shows full ToDo API functionality.

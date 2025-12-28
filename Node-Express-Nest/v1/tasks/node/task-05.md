@@ -61,7 +61,7 @@ Extend your Task 04 HTTP server by adding an **event-driven layer** using Node's
     "totalViews": 8,
     "errors": 1,
     "dailyStats": {
-      "2024-01-01": {
+      "2026-01-01": {
         "created": 2,
         "updated": 1,
         "deleted": 0,
@@ -80,7 +80,7 @@ Events Example
   "data": [
     {
       "eventType": "todoCreated",
-      "timestamp": "2024-01-01T10:00:00.000Z",
+      "timestamp": "2026-01-01T10:00:00.000Z",
       "data": { "todo": { "id": 1, "title": "New Todo" } }
     }
   ]

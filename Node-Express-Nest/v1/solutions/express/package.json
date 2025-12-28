@@ -1,0 +1,17 @@
+﻿{
+  "name": "express-solutions",
+  "version": "1.0.0",
+  "description": "Express.js tasks solutions",
+  "main": "task-01.js",
+  "scripts": {
+    "task1": "node task-01.js",
+    "task2": "node task-02.js",
+    "task3": "node task-03.js",
+    "task4": "node task-04.js",
+    "task5": "node task-05.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1"
+  }
+}

@@ -9,7 +9,7 @@ const TodoServer = require("./task-04");
 class TodoServerTester {
   constructor() {
     this.testResults = [];
-    this.baseUrl = "http://localhost:3001"; // Use different port for testing
+    this.baseUrl = "http://localhost:3001";
     this.server = null;
     this.testServer = null;
   }
@@ -19,12 +19,12 @@ class TodoServerTester {
    */
   async runTest(name, testFunction) {
     try {
-      console.log(`🧪 Running: ${name}`);
+      console.log(`Running: ${name}`);
       await testFunction();
-      console.log(`✅ Passed: ${name}`);
+      console.log(`Passed: ${name}`);
       this.testResults.push({ name, status: "PASS" });
     } catch (error) {
-      console.log(`❌ Failed: ${name} - ${error.message}`);
+      console.log(`Failed: ${name} - ${error.message}`);
       this.testResults.push({ name, status: "FAIL", error: error.message });
     }
   }
@@ -33,10 +33,8 @@ class TodoServerTester {
    * Setup test environment
    */
   async setupTestEnvironment() {
-    // Start test server on port 3001
     this.server = new TodoServer(3001);
 
-    // Create a promise to wait for server to start
     await new Promise((resolve, reject) => {
       try {
         this.testServer = http.createServer((req, res) => {
@@ -56,7 +54,6 @@ class TodoServerTester {
       }
     });
 
-    // Wait a bit for server to be ready
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
@@ -130,7 +127,7 @@ class TodoServerTester {
 
     if (response.statusCode === 501) {
       throw new Error(
-        "Server started but endpoints not implemented yet - this is expected for TODO template"
+        "Server started but endpoints not implemented yet"
       );
     }
 
@@ -219,7 +216,6 @@ class TodoServerTester {
    * Test: GET /todos/:id should return specific todo
    */
   async testGetTodoById() {
-    // First create a todo
     const newTodo = {
       title: "Test Todo for Get by ID",
       description: "Test description",
@@ -238,7 +234,6 @@ class TodoServerTester {
       );
     }
 
-    // Now test getting by ID
     const response = await this.makeRequest("GET", `/todos/${todoId}`);
 
     if (response.statusCode === 501) {
@@ -264,7 +259,6 @@ class TodoServerTester {
    * Test: PUT /todos/:id should update todo
    */
   async testUpdateTodo() {
-    // First create a todo
     const newTodo = {
       title: "Test Todo for Update",
       description: "Original description",
@@ -283,7 +277,6 @@ class TodoServerTester {
       );
     }
 
-    // Update the todo
     const updateData = {
       title: "Updated Todo Title",
       completed: true,
@@ -326,7 +319,6 @@ class TodoServerTester {
    * Test: DELETE /todos/:id should delete todo
    */
   async testDeleteTodo() {
-    // First create a todo
     const newTodo = {
       title: "Test Todo for Delete",
       description: "This todo will be deleted",
@@ -345,7 +337,6 @@ class TodoServerTester {
       );
     }
 
-    // Delete the todo
     const response = await this.makeRequest("DELETE", `/todos/${todoId}`);
 
     if (response.statusCode === 501) {
@@ -366,7 +357,6 @@ class TodoServerTester {
       throw new Error("Response should have success message");
     }
 
-    // Verify todo is deleted by trying to get it
     const getResponse = await this.makeRequest("GET", `/todos/${todoId}`);
     if (getResponse.statusCode !== 404) {
       throw new Error("Deleted todo should return 404 when accessed");
@@ -377,11 +367,9 @@ class TodoServerTester {
    * Test: Error handling for invalid requests
    */
   async testErrorHandling() {
-    // Test 404 for non-existent todo
     const response404 = await this.makeRequest("GET", "/todos/99999");
 
     if (response404.statusCode === 501) {
-      // If endpoints not implemented, skip this test
       return;
     }
 
@@ -393,7 +381,6 @@ class TodoServerTester {
       throw new Error("Error response should have success: false");
     }
 
-    // Test 400 for invalid JSON (if POST is implemented)
     try {
       const response400 = await this.makeRequest(
         "POST",
@@ -401,14 +388,13 @@ class TodoServerTester {
         "invalid json"
       );
       if (response400.statusCode === 501) {
-        return; // POST not implemented, skip
+        return;
       }
 
       if (response400.statusCode !== 400) {
         throw new Error("Invalid JSON should return 400");
       }
     } catch (error) {
-      // Expected for malformed JSON
     }
   }
 
@@ -416,7 +402,6 @@ class TodoServerTester {
    * Test: Query parameter filtering
    */
   async testQueryFiltering() {
-    // Create completed and incomplete todos first
     await this.makeRequest("POST", "/todos", {
       title: "Completed Todo",
       completed: true,
@@ -426,7 +411,6 @@ class TodoServerTester {
       completed: false,
     });
 
-    // Test filtering by completed status
     const completedResponse = await this.makeRequest(
       "GET",
       "/todos?completed=true"
@@ -440,7 +424,6 @@ class TodoServerTester {
       throw new Error("Query filtering should work");
     }
 
-    // Check that filtering works (basic check)
     if (!Array.isArray(completedResponse.body.data)) {
       throw new Error("Filtered response should return data array");
     }
@@ -476,7 +459,7 @@ class TodoServerTester {
    * Run all tests
    */
   async runAllTests() {
-    console.log("🚀 Starting Todo Server Tests...\n");
+    console.log("Starting Todo Server Tests...\n");
 
     await this.setupTestEnvironment();
 
@@ -517,49 +500,29 @@ class TodoServerTester {
    * Print test results summary
    */
   printResults() {
-    console.log("\n📊 Test Results:");
+    console.log("\nTest Results:");
     console.log("==================");
 
     const passed = this.testResults.filter((r) => r.status === "PASS").length;
     const failed = this.testResults.filter((r) => r.status === "FAIL").length;
 
-    console.log(`✅ Passed: ${passed}`);
-    console.log(`❌ Failed: ${failed}`);
+    console.log(`Passed: ${passed}`);
+    console.log(`Failed: ${failed}`);
     console.log(
-      `📈 Success Rate: ${Math.round(
+      `Success Rate: ${Math.round(
         (passed / this.testResults.length) * 100
       )}%`
     );
 
     if (failed > 0) {
-      console.log("\n❌ Failed Tests:");
+      console.log("\nFailed Tests:");
       this.testResults
         .filter((r) => r.status === "FAIL")
         .forEach((r) => console.log(`  - ${r.name}: ${r.error}`));
     }
 
-    console.log(
-      "\n" +
-        (failed === 0
-          ? "🎉 All tests passed!"
-          : "🔧 Some tests need attention.")
-    );
-
     if (failed === 0) {
-      console.log(
-        "\n🌟 Great job! Your Todo Server implementation is working correctly!"
-      );
-      console.log("💡 Try implementing the bonus features:");
-      console.log("   - Request logging middleware");
-      console.log("   - Request rate limiting");
-      console.log("   - Data persistence to file system");
-      console.log("   - HTML client interface");
-    } else {
-      console.log("\n💡 Implementation Tips:");
-      console.log("   - Start with basic server structure");
-      console.log("   - Implement helper functions first");
-      console.log("   - Add CRUD operations one by one");
-      console.log("   - Test each endpoint as you implement it");
+      console.log("\nAll tests passed!");
     }
   }
 }
@@ -572,16 +535,16 @@ async function runTests() {
     const tester = new TodoServerTester();
     await tester.runAllTests();
   } catch (error) {
-    console.error("❌ Test setup failed:", error.message);
+    console.error("Test setup failed:", error.message);
     console.log(
-      "\n💡 Make sure you have implemented the TodoServer class in task-04.js"
+      "\nMake sure you have implemented the TodoServer class in task-04.js"
     );
   }
 }
 
 // Run tests if this file is executed directly
 if (require.main === module) {
-  console.log("🧪 Todo Server Test Suite");
+  console.log("Todo Server Test Suite");
   console.log("==========================\n");
   runTests();
 }

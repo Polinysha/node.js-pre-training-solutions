@@ -1,0 +1,90 @@
+Task 05: Event-Driven ToDo Server with Logging & Analytics
+===========================================================
+
+Описание реализации:
+
+1. Архитектура:
+- TodoServer наследуется от EventEmitter для реализации событийной модели
+- Добавлены классы ConsoleLogger для логирования и AnalyticsTracker для аналитики
+- Все CRUD операции сохраняются из Task 04 с добавлением эмиттирования событий
+
+2. Реализованные события:
+- todoCreated - при создании новой задачи
+- todoUpdated - при обновлении задачи (PUT/PATCH)
+- todoDeleted - при удалении задачи
+- todoViewed - при просмотре задачи по ID
+- todosListed - при получении списка задач
+- todoNotFound - при попытке доступа к несуществующей задаче
+- validationError - при ошибках валидации данных
+- serverError - при внутренних ошибках сервера
+
+3. Система аналитики:
+- Счетчики для всех типов операций
+- Ежедневная статистика по датам
+- История событий (максимум 100 последних событий)
+
+4. Новые эндпоинты:
+- GET /analytics - возвращает статистику по операциям
+- GET /events?last=n - возвращает последние n событий (по умолчанию 10)
+
+5. Логирование:
+- ConsoleLogger выводит события в консоль с метками времени
+- Все события также сохраняются для доступа через API
+
+6. Информация о запросах:
+- Каждое событие включает requestInfo с методом, URL, заголовками
+- Добавлены временные метки для всех событий
+
+Инструкции по запуску:
+
+1. Запуск сервера:
+   node task-05.js
+
+2. Тестирование функционала:
+   node task-05-test.js
+
+3. Примеры ручного тестирования:
+   - curl http://localhost:3000/todos
+   - curl -X POST http://localhost:3000/todos -H "Content-Type: application/json" -d '{"title":"Test Todo"}'
+   - curl http://localhost:3000/todos/1
+   - curl http://localhost:3000/analytics
+   - curl http://localhost:3000/events?last=5
+
+4. Ожидаемый вывод в консоли:
+   [timestamp] EVENT: todoCreated
+   [timestamp] EVENT: todoViewed
+   [timestamp] EVENT: todoUpdated
+
+Особенности реализации:
+
+- Все события передаются слушателям синхронно
+- AnalyticsTracker обновляет статистику при каждом событии
+- ConsoleLogger выводит события в удобочитаемом формате
+- Поддержка CORS для всех эндпоинтов
+- Валидация входных данных с эмиттированием validationError
+
+Структура данных аналитики:
+{
+  "success": true,
+  "data": {
+    "totalCreated": 0,
+    "totalUpdated": 0,
+    "totalDeleted": 0,
+    "totalViews": 0,
+    "totalListings": 0,
+    "errors": 0,
+    "dailyStats": {}
+  }
+}
+
+Структура данных событий:
+{
+  "success": true,
+  "data": [
+    {
+      "eventType": "todoCreated",
+      "timestamp": "2026-01-01T10:00:00.000Z",
+      "data": { "todo": { "id": 1, "title": "New Todo" } }
+    }
+  ]
+}

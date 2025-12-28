@@ -1,0 +1,30 @@
+﻿Task 5: Request Logging and Metrics Middleware
+=================================================
+
+Objective: Implement a middleware to log request details and track basic stats.
+Expose /metrics endpoint to view them.
+
+Implementation:
+1. MetricsTracker class for collecting statistics
+2. Request logging middleware with detailed info
+3. /metrics endpoint for viewing stats
+4. /metrics/requests endpoint for request history
+
+Key Features:
+- Request logging with timestamps, methods, URLs
+- Response time tracking
+- Error rate calculation
+- Metrics by method, route, and status
+- Last hour statistics
+
+To run: node task-05.js
+Server runs on: http://localhost:3004
+
+Test commands:
+curl http://localhost:3004/todos
+curl http://localhost:3004/metrics
+curl http://localhost:3004/metrics/requests?limit=5
+curl -X POST http://localhost:3004/todos -H "Content-Type: application/json" -d '{"title":"Test Metrics"}'
+curl http://localhost:3004/error
+
+Expected output shows detailed metrics and logging.
