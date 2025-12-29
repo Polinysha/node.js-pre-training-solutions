@@ -1,0 +1,17 @@
+﻿{
+  "name": "my-docker-node-app",
+  "version": "1.0.0",
+  "description": "Simple Node.js app for Docker practice",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": "24.x"
+  },
+  "keywords": ["docker", "nodejs"],
+  "author": "Polina",
+  "license": "MIT"
+}

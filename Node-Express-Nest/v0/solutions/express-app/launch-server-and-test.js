@@ -2,7 +2,7 @@
 const { spawn } = require('child_process');
 const http = require('http');
 
-console.log('🚀 Запускаем Express сервер...');
+console.log('. Запускаем Express сервер...');
 
 // Запускаем сервер
 const server = spawn('node', ['index.js'], {
@@ -32,7 +32,7 @@ function waitForServer(retries = 10, delay = 1000) {
             }, (res) => {
                 res.on('data', () => {});
                 res.on('end', () => {
-                    console.log(\✅ Сервер запущен и отвечает (попытка \)\);
+                    console.log(\. Сервер запущен и отвечает (попытка \)\);
                     resolve();
                 });
             });
@@ -78,8 +78,8 @@ async function main() {
         });
         
         testProcess.on('close', (code) => {
-            console.log(\\n📊 Тесты завершены с кодом: \\);
-            console.log('\n🎯 РУКОВОДСТВО ПО ИСПОЛЬЗОВАНИЮ:');
+            console.log(\\n. Тесты завершены с кодом: \\);
+            console.log('\n. РУКОВОДСТВО ПО ИСПОЛЬЗОВАНИЮ:');
             console.log('1. GET /todos              - все задачи');
             console.log('2. POST /todos             - создать задачу');
             console.log('3. GET /todos/1            - задача по ID');
@@ -89,7 +89,7 @@ async function main() {
         });
         
     } catch (error) {
-        console.error('❌ Ошибка:', error.message);
+        console.error('. Ошибка:', error.message);
         server.kill();
         process.exit(1);
     }

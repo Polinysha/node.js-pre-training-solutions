@@ -21,7 +21,7 @@ async function test() {
     console.log(`Найдено задач: ${todos.length}`);
     todos.forEach(t => console.log(`  - ${t.title} (ID: ${t.id})`));
     
-    console.log('\n✅ Данные сохраняются в рамках одного процесса!');
+    console.log('\n. Данные сохраняются в рамках одного процесса!');
 }
 
 test().catch(console.error);

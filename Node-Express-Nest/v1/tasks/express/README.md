@@ -1,4 +1,4 @@
-## ✅ **Express.js**
+## . **Express.js**
 
 ### 🧪 **General Tasks (Out of ToDo context):**
 
@@ -22,7 +22,7 @@
 
 ---
 
-### ✅ **ToDo-Specific Tasks (Express style):**
+### . **ToDo-Specific Tasks (Express style):**
 
 4. **Task 4: Wire Up ToDo REST API**
    Use Express to serve the ToDo endpoints.

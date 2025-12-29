@@ -71,19 +71,19 @@ async function runTests() {
         const result = await makeRequest(test.method, test.path, test.data);
         
         if (result.success) {
-            console.log(\   ✅ \ - Успех\);
+            console.log(\   . \ - Успех\);
             if (Array.isArray(result.data)) {
                 console.log(\      Элементов: \\);
             }
         } else {
-            console.log(\   ❌ \ - \\);
+            console.log(\   . \ - \\);
         }
         
         // Пауза между запросами
         await new Promise(r => setTimeout(r, 100));
     }
     
-    console.log('\n🎯 ТЕСТИРОВАНИЕ ЗАВЕРШЕНО');
+    console.log('\n. ТЕСТИРОВАНИЕ ЗАВЕРШЕНО');
     console.log('👉 Откройте браузер: http://localhost:3000/todos');
 }
 

@@ -443,7 +443,7 @@ app.listen(PORT, () => {
     console.log('  curl http://localhost:3004/metrics/requests?limit=5');
     console.log('  curl http://localhost:3004/error');
     console.log('='.repeat(50));
-    console.log('\n📊 Metrics middleware is active on all routes');
+    console.log('\n. Metrics middleware is active on all routes');
     console.log('All requests are being logged and tracked');
     console.log('='.repeat(50));
 });

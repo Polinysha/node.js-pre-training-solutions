@@ -28,12 +28,12 @@ class StreamTransformerTester {
    */
   async runTest(name, testFunction) {
     try {
-      console.log(`🧪 Running: ${name}`);
+      console.log(` Running: ${name}`);
       await testFunction();
-      console.log(`✅ Passed: ${name}`);
+      console.log(` Passed: ${name}`);
       this.testResults.push({ name, status: "PASS" });
     } catch (error) {
-      console.log(`❌ Failed: ${name} - ${error.message}`);
+      console.log(` Failed: ${name} - ${error.message}`);
       this.testResults.push({ name, status: "FAIL", error: error.message });
     }
   }
@@ -411,7 +411,7 @@ alice brown,alice.brown@company.org,9876543210,1988/07/04,houston`;
    * Run all tests
    */
   async runAllTests() {
-    console.log("🚀 Starting Stream Transformer Tests...\n");
+    console.log(" Starting Stream Transformer Tests...\n");
 
     // Setup test environment
     this.setupTestEnvironment();
@@ -455,22 +455,22 @@ alice brown,alice.brown@company.org,9876543210,1988/07/04,houston`;
    * Print test results summary
    */
   printResults() {
-    console.log("\n📊 Test Results:");
+    console.log("\n Test Results:");
     console.log("==================");
 
     const passed = this.testResults.filter((r) => r.status === "PASS").length;
     const failed = this.testResults.filter((r) => r.status === "FAIL").length;
 
-    console.log(`✅ Passed: ${passed}`);
-    console.log(`❌ Failed: ${failed}`);
+    console.log(` Passed: ${passed}`);
+    console.log(` Failed: ${failed}`);
     console.log(
-      `📈 Success Rate: ${Math.round(
+      ` Success Rate: ${Math.round(
         (passed / this.testResults.length) * 100
       )}%`
     );
 
     if (failed > 0) {
-      console.log("\n❌ Failed Tests:");
+      console.log("\n Failed Tests:");
       this.testResults
         .filter((r) => r.status === "FAIL")
         .forEach((r) => console.log(`  - ${r.name}: ${r.error}`));
@@ -479,15 +479,15 @@ alice brown,alice.brown@company.org,9876543210,1988/07/04,houston`;
     console.log(
       "\n" +
         (failed === 0
-          ? "🎉 All tests passed!"
-          : "🔧 Some tests need attention.")
+          ? " All tests passed!"
+          : " Some tests need attention.")
     );
 
     if (failed === 0) {
       console.log(
-        "\n🌟 Great job! Your Stream Transformer implementation is working correctly!"
+        "\n Great job! Your Stream Transformer implementation is working correctly!"
       );
-      console.log("💡 Try implementing the bonus features:");
+      console.log(" Try implementing the bonus features:");
       console.log("   - Progress reporting for large files");
       console.log("   - Support for different CSV delimiters");
       console.log("   - Data validation with detailed error reporting");
@@ -505,16 +505,16 @@ async function runTests() {
     const tester = new StreamTransformerTester();
     await tester.runAllTests();
   } catch (error) {
-    console.error("❌ Test setup failed:", error.message);
+    console.error(". Test setup failed:", error.message);
     console.log(
-      "\n💡 Make sure you have implemented all required functionality in task-02.js"
+      "\n Make sure you have implemented all required functionality in task-02.js"
     );
   }
 }
 
 // Run tests if this file is executed directly
 if (require.main === module) {
-  console.log("🧪 Stream Transformer Test Suite");
+  console.log(" Stream Transformer Test Suite");
   console.log("=================================\n");
   runTests();
 }

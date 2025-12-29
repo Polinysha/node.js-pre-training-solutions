@@ -571,9 +571,9 @@ class StrictEventLoopTester {
    * Run all tests with strict validation
    */
   async runAllTests() {
-    console.log("🚀 Starting STRICT Event Loop & Async Debugging Tests...\n");
+    console.log(". Starting STRICT Event Loop & Async Debugging Tests...\n");
     console.log(
-      "⚠️  These tests require actual implementation - they will fail with TODO stubs!\n"
+      ".  These tests require actual implementation - they will fail with TODO stubs!\n"
     );
 
     await this.setupTestEnvironment();

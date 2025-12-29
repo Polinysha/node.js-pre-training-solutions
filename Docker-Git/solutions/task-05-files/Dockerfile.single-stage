@@ -1,0 +1,24 @@
+﻿# Single-stage Dockerfile (not optimized)
+FROM node:24
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install ALL dependencies (including dev dependencies)
+RUN npm install
+
+# Copy source code
+COPY src ./src
+
+# Build TypeScript
+RUN npm run build
+
+# Expose port
+EXPOSE 3000
+
+# Start command
+CMD ["npm", "start"]
