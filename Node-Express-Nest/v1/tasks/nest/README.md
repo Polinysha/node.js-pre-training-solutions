@@ -1,4 +1,4 @@
-## ✅ **NestJS**
+## . **NestJS**
 
 ### 🧪 **General Tasks (Out of ToDo context):**
 
@@ -22,7 +22,7 @@
 
 ---
 
-### ✅ **ToDo-Specific Tasks (NestJS style):**
+### . **ToDo-Specific Tasks (NestJS style):**
 
 4. **Task 4: Setup ToDo CRUD with DTOs**
    Create a `TodoModule` with `TodoController` and `TodoService`.

@@ -1,16 +1,16 @@
 ﻿# Docker-Git Module Progress
 
-## ✅ Completed:
+## . Completed:
 1. Task 01: GIT FUNDAMENTALS - First repository with commits
 2. Task 02: GIT BRANCHING - Branch creation, merging, conflict resolution
 3. Task 03: DOCKER FUNDAMENTALS - First Docker container with Node.js
 4. Task 04: GIT CONFLICTS - Merge conflict simulation and resolution
 5. Task 05: DOCKER OPTIMIZATION - Multi-stage builds and image optimization
 
-## 🔄 In Progress:
+## .In Progress:
 6. Task 06: GIT ADVANCED
 
-## ⏳ Pending:
+## . Pending:
 7. Task 07: DOCKER COMPOSE
 8. Task 08: GIT WORKFLOW
 9. Task 09: DOCKER COMMANDS

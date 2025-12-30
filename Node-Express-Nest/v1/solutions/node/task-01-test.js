@@ -18,7 +18,7 @@ class MessageSystemTester {
     try {
       console.log(`🧪 Running: ${name}`);
       await testFunction();
-      console.log(`✅ Passed: ${name}`);
+      console.log(`. Passed: ${name}`);
       this.testResults.push({ name, status: "PASS" });
     } catch (error) {
       console.log(`❌ Failed: ${name} - ${error.message}`);
@@ -334,7 +334,7 @@ class MessageSystemTester {
     const passed = this.testResults.filter((r) => r.status === "PASS").length;
     const failed = this.testResults.filter((r) => r.status === "FAIL").length;
 
-    console.log(`✅ Passed: ${passed}`);
+    console.log(`. Passed: ${passed}`);
     console.log(`❌ Failed: ${failed}`);
     console.log(
       `📈 Success Rate: ${Math.round(

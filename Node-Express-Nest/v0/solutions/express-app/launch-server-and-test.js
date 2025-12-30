@@ -41,7 +41,7 @@ function waitForServer(retries = 10, delay = 1000) {
                 if (attemptCount >= retries) {
                     reject(new Error(\Сервер не запустился после \ попыток\));
                 } else {
-                    console.log(\⏳ Ожидаем сервер... (\/\)\);
+                    console.log(\. Ожидаем сервер... (\/\)\);
                     setTimeout(() => attempt(attemptCount + 1), delay);
                 }
             });
@@ -51,7 +51,7 @@ function waitForServer(retries = 10, delay = 1000) {
                 if (attemptCount >= retries) {
                     reject(new Error('Таймаут ожидания сервера'));
                 } else {
-                    console.log(\⏳ Таймаут, пробуем еще... (\/\)\);
+                    console.log(\. Таймаут, пробуем еще... (\/\)\);
                     setTimeout(() => attempt(attemptCount + 1), delay);
                 }
             });
