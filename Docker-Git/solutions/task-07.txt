@@ -1,0 +1,315 @@
+﻿=== TASK 07 SOLUTION: Docker Compose Orchestration ===
+Date: 2026-01-01 18:32:00
+
+PROJECT STRUCTURE:
+==================
+task-07-docker-compose/
+├── docker-compose.yml          # Main compose file
+├── node-api/                   # Node.js Express API
+│   ├── app.js                 # API endpoints (/health, /data)
+│   ├── package.json           # Express dependencies
+│   ├── Dockerfile             # Node.js 24-alpine image
+│   └── .dockerignore          # Excluded files
+├── init-db/                   # Database initialization
+│   └── init.sql              # SQL scripts for tables and data
+└── README.md                  # Setup instructions
+
+DOCKER COMPOSE COMMANDS USED:
+=============================
+1. Start all services in detached mode:
+   docker-compose up -d
+
+2. Check service status:
+   docker-compose ps
+
+3. View logs:
+   docker-compose logs -f
+   docker-compose logs node-api
+   docker-compose logs postgres-db
+   docker-compose logs pgadmin
+
+4. Stop services:
+   docker-compose stop
+
+5. Stop and remove containers, networks:
+   docker-compose down
+
+6. Stop, remove containers, networks and volumes:
+   docker-compose down -v
+
+7. Rebuild and restart specific service:
+   docker-compose up -d --build node-api
+
+8. Execute commands in running containers:
+   docker exec -it node-api-service sh
+   docker exec -it postgres-database psql -U postgres -d appdb
+
+9. Check service health:
+   docker-compose ps --services
+
+10. View resource usage:
+   docker stats
+
+DOCKER-COMPOSE.YML CONTENT:
+===========================
+version: '3.8'
+
+services:
+  # Node.js API Service
+  node-api:
+    build: ./node-api
+    container_name: node-api-service
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=secretpassword
+      - DB_NAME=appdb
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database Service
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: postgres-database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secretpassword
+      - POSTGRES_DB=appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # pgAdmin Database Management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-web
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=adminpassword
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - postgres-db
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Custom network for communication between services
+networks:
+  app-network:
+    driver: bridge
+    name: app-network
+
+# Persistent volumes for data
+volumes:
+  postgres-data:
+    name: postgres-docker-compose-data
+  pgadmin-data:
+    name: pgadmin-docker-compose-data
+
+
+NODE-API DOCKERFILE:
+====================
+# Node.js API Dockerfile
+FROM node:24-alpine
+
+# Create app directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy app source
+COPY . .
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+USER nodejs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Expose port
+EXPOSE 3000
+
+# Start command
+CMD ["node", "app.js"]
+
+
+DATABASE INITIALIZATION SCRIPT:
+===============================
+-- init.sql - Database initialization script
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS items (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert sample data
+INSERT INTO users (username, email) VALUES
+('john_doe', 'john@example.com'),
+('jane_smith', 'jane@example.com')
+ON CONFLICT (username) DO NOTHING;
+
+INSERT INTO items (name, description, price) VALUES
+('Laptop', 'High-performance laptop', 1299.99),
+('Mouse', 'Wireless mouse', 29.99),
+('Keyboard', 'Mechanical keyboard', 89.99)
+ON CONFLICT (id) DO NOTHING;
+
+-- Create read-only user for pgAdmin
+CREATE USER readonly_user WITH PASSWORD 'readonly123';
+GRANT CONNECT ON DATABASE appdb TO readonly_user;
+GRANT USAGE ON SCHEMA public TO readonly_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly_user;
+
+
+SERVICE ACCESS INFORMATION:
+===========================
+1. NODE.JS API:
+   - URL: http://localhost:3000
+   - Health endpoint: http://localhost:3000/health
+   - Data endpoint: http://localhost:3000/data
+   - Container port: 3000
+   - Environment: Node.js 24-alpine
+
+2. POSTGRESQL DATABASE:
+   - Host: localhost (or postgres-db from within network)
+   - Port: 5432
+   - Database: appdb
+   - Username: postgres
+   - Password: secretpassword
+   - Image: postgres:16-alpine
+   - Data volume: postgres-docker-compose-data
+
+3. PGADMIN WEB INTERFACE:
+   - URL: http://localhost:5050
+   - Email: admin@example.com
+   - Password: adminpassword
+   - Image: dpage/pgadmin4:latest
+   - Data volume: pgadmin-docker-compose-data
+
+SERVICE CONNECTION DETAILS:
+===========================
+To connect pgAdmin to PostgreSQL:
+1. Open http://localhost:5050
+2. Login with: admin@example.com / adminpassword
+3. Right-click "Servers" → Register → Server
+4. General tab:
+   - Name: PostgreSQL Docker
+5. Connection tab:
+   - Host: postgres-db (container name, not localhost)
+   - Port: 5432
+   - Database: appdb
+   - Username: postgres
+   - Password: secretpassword
+6. Save and connect
+
+DOCKER-COMPOSE PS OUTPUT EXAMPLE:
+=================================
+SERVICE STATUS WHEN RUNNING:
+Name                Command               State           Ports
+-------------------------------------------------------------------
+node-api-service   docker-entrypoint.sh node ...   Up      0.0.0.0:3000->3000/tcp
+pgadmin-web        /entrypoint.sh            Up      0.0.0.0:5050->80/tcp
+postgres-database  docker-entrypoint.sh postgres   Up      0.0.0.0:5432->5432/tcp
+
+TESTING PROCEDURE:
+==================
+1. Start services:
+   docker-compose up -d
+
+2. Verify all services are running:
+   docker-compose ps
+
+3. Test API endpoints:
+   curl http://localhost:3000/health
+   curl http://localhost:3000/data
+
+4. Access pgAdmin:
+   Open browser to http://localhost:5050
+   Login and connect to PostgreSQL
+
+5. Verify database:
+   docker exec postgres-database psql -U postgres -d appdb -c "\dt"
+   docker exec postgres-database psql -U postgres -d appdb -c "SELECT * FROM users;"
+
+BENEFITS OF DOCKER COMPOSE:
+===========================
+1. Simplified multi-service management
+2. Consistent environment configuration
+3. Easy service scaling
+4. Network isolation and service discovery
+5. Volume management
+6. Health monitoring
+7. Dependency resolution
+8. Easy deployment and teardown
+
+VERIFICATION:
+=============
+- [x] Created Node.js Express API with /health and /data endpoints
+- [x] Created Dockerfile for Node.js application
+- [x] Created docker-compose.yml with 3 services
+- [x] Configured PostgreSQL database with volume
+- [x] Added pgAdmin for database management
+- [x] Set up proper networking between services
+- [x] Implemented health checks for all services
+- [x] Tested all services individually
+- [x] Verified inter-service communication
+- [x] Documented access credentials and URLs
+
+CONCLUSION:
+===========
+Docker Compose simplifies the orchestration of multi-container
+applications by providing a declarative way to define, configure,
+and manage services. The setup demonstrated shows how to create
+a complete application stack with API, database, and management
+interface that can be easily started, stopped, and managed as
+a single unit.
