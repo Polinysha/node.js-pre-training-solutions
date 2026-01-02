@@ -1,0 +1,16 @@
+﻿{
+  "name": "docker-commands-practice",
+  "version": "1.0.0",
+  "description": "Practice files for Docker commands",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "redis-test": "node redis-test.js"
+  },
+  "dependencies": {
+    "redis": "^4.6.0"
+  },
+  "keywords": ["docker", "practice", "commands"],
+  "author": "Student",
+  "license": "MIT"
+}
