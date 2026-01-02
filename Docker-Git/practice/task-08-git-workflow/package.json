@@ -1,0 +1,13 @@
+﻿{
+  "name": "calculator-project",
+  "version": "1.0.0",
+  "description": "Calculator project for Git workflow practice",
+  "main": "calculator.js",
+  "scripts": {
+    "test": "node calculator.test.js",
+    "start": "node example.js"
+  },
+  "keywords": ["calculator", "git", "workflow", "practice"],
+  "author": "Student",
+  "license": "MIT"
+}

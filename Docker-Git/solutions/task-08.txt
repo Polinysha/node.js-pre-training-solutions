@@ -1,0 +1,466 @@
+﻿=== TASK 08 SOLUTION: Git Workflow with Multiple Remotes ===
+Date: 2026-01-02 17:35:29
+
+PROJECT OVERVIEW:
+=================
+Project: Calculator application with unit tests
+Purpose: Practice Git workflow with multiple remotes (simulating team environment)
+
+WORKFLOW SIMULATION SCENARIO:
+=============================
+We are simulating:
+1. "upstream" - Company's main repository
+2. "origin"   - Your personal fork
+3. Local repository - Your working copy
+
+STEP-BY-STEP EXECUTION:
+=======================
+
+STEP 1: INITIALIZE LOCAL REPOSITORY
+-----------------------------------
+# Create and initialize local repository
+git init
+git add .
+git commit -m "Initial commit: Calculator project with basic operations"
+
+STEP 2: SIMULATE "UPSTREAM" (COMPANY REPO)
+------------------------------------------
+# Create a bare repository to simulate upstream
+cd ..
+mkdir upstream-repo.git
+cd upstream-repo.git
+git init --bare
+cd ../task-08-git-workflow
+
+# Add upstream remote
+git remote add upstream ../upstream-repo.git
+
+STEP 3: SIMULATE "ORIGIN" (YOUR FORK)
+-------------------------------------
+# Create another bare repository to simulate your fork
+cd ..
+mkdir origin-repo.git
+cd origin-repo.git
+git init --bare
+cd ../task-08-git-workflow
+
+# Add origin remote
+git remote add origin ../origin-repo.git
+
+STEP 4: PUSH TO "UPSTREAM" (SIMULATE INITIAL COMPANY REPO)
+----------------------------------------------------------
+git push upstream main
+
+STEP 5: FORK SIMULATION - PUSH TO "ORIGIN"
+------------------------------------------
+git push origin main
+
+STEP 6: CONFIRM REMOTE CONFIGURATION
+-------------------------------------
+git remote -v
+# Expected output:
+# origin    ../origin-repo.git (fetch)
+# origin    ../origin-repo.git (push)
+# upstream  ../upstream-repo.git (fetch)
+# upstream  ../upstream-repo.git (push)
+
+STEP 7: CREATE FEATURE BRANCH
+------------------------------
+git checkout -b feature/add-trigonometric-functions
+
+STEP 8: IMPLEMENT NEW FEATURE
+------------------------------
+# Add trigonometric functions to calculator.js
+cat >> calculator.js << 'EOF'
+
+// Trigonometric functions
+sin: (angle) => Math.sin(angle),
+cos: (angle) => Math.cos(angle),
+tan: (angle) => Math.tan(angle),
+degreesToRadians: (degrees) => degrees * (Math.PI / 180),
+radiansToDegrees: (radians) => radians * (180 / Math.PI)
+EOF
+
+# Add tests for trigonometric functions
+cat >> calculator.test.js << 'EOF'
+
+// Test trigonometric functions
+console.assert(Math.abs(calculator.sin(Math.PI/2) - 1) < 0.0001, 'Sine test failed');
+console.assert(Math.abs(calculator.cos(0) - 1) < 0.0001, 'Cosine test failed');
+console.assert(Math.abs(calculator.degreesToRadians(180) - Math.PI) < 0.0001, 'Degrees to radians test failed');
+EOF
+
+STEP 9: COMMIT FEATURE WITH GOOD MESSAGES
+------------------------------------------
+git add calculator.js calculator.test.js
+git commit -m "feat: add trigonometric functions
+
+- Added sin, cos, tan functions
+- Added angle conversion utilities (degrees/radians)
+- Added unit tests for trigonometric functions
+- All existing tests still pass"
+
+STEP 10: ADD DOCUMENTATION
+--------------------------
+# Update README with new features
+cat >> README.md << 'EOF'
+
+## New Features (v1.1)
+
+### Trigonometric Functions
+- \sin(angle)\: Sine of angle (radians)
+- \cos(angle)\: Cosine of angle (radians)
+- \	an(angle)\: Tangent of angle (radians)
+- \degreesToRadians(deg)\: Convert degrees to radians
+- \adiansToDegrees(rad)\: Convert radians to degrees
+
+### Example
+\\\javascript
+console.log(calculator.sin(Math.PI/2)); // 1
+console.log(calculator.degreesToRadians(180)); // 3.14159...
+\\\
+EOF
+
+git add README.md
+git commit -m "docs: update README with trigonometric functions documentation
+
+- Added documentation for new trigonometric functions
+- Included usage examples
+- Updated feature list"
+
+STEP 11: PUSH FEATURE BRANCH TO FORK
+-------------------------------------
+git push origin feature/add-trigonometric-functions
+
+STEP 12: SIMULATE PULL REQUEST WORKFLOW
+----------------------------------------
+# Switch to main branch in upstream (simulating other work)
+cd ../upstream-repo.git
+# Note: We're in bare repo, so we use update-ref
+git update-ref refs/heads/main refs/heads/main
+
+# Back to working directory
+cd ../task-08-git-workflow
+
+# Fetch upstream changes
+git fetch upstream
+
+# Rebase feature branch on updated main (best practice)
+git checkout feature/add-trigonometric-functions
+git rebase upstream/main
+
+# If there are conflicts (simulating scenario):
+# 1. Resolve conflicts in calculator.js
+# 2. git add calculator.js
+# 3. git rebase --continue
+
+STEP 13: HANDLE "REVIEW COMMENTS" SIMULATION
+---------------------------------------------
+# Simulate code review feedback - need to add error handling
+cat >> calculator.js << 'EOF'
+
+// Enhanced trigonometric functions with error handling
+sin: (angle) => {
+    if (typeof angle !== 'number') return 'Error: Invalid input';
+    return Math.sin(angle);
+},
+cos: (angle) => {
+    if (typeof angle !== 'number') return 'Error: Invalid input';
+    return Math.cos(angle);
+},
+// ... similar for other functions
+EOF
+
+git add calculator.js
+git commit -m "fix: add input validation to trigonometric functions
+
+- Added type checking for all trigonometric functions
+- Returns error message for invalid inputs
+- Maintains backward compatibility"
+
+STEP 14: FORCE PUSH UPDATED FEATURE BRANCH (SAFELY)
+---------------------------------------------------
+git push --force-with-lease origin feature/add-trigonometric-functions
+
+STEP 15: SIMULATE PULL REQUEST MERGE
+-------------------------------------
+# Switch to main branch
+git checkout main
+
+# Merge feature branch (simulating PR merge)
+git merge --no-ff feature/add-trigonometric-functions -m "Merge pull request #1: Add trigonometric functions
+
+Adds trigonometric functions with error handling:
+- sin, cos, tan functions
+- Angle conversion utilities
+- Comprehensive unit tests
+- Input validation
+
+Closes #1"
+
+STEP 16: SYNCHRONIZE FORK WITH UPSTREAM
+----------------------------------------
+# Push merged changes to upstream
+git push upstream main
+
+# Update your fork (origin) with upstream changes
+git push origin main
+
+STEP 17: CLEAN UP FEATURE BRANCH
+---------------------------------
+# Delete local feature branch
+git branch -d feature/add-trigonometric-functions
+
+# Delete remote feature branch
+git push origin --delete feature/add-trigonometric-functions
+
+STEP 18: SIMULATE UPSTREAM CHANGES BY ANOTHER DEVELOPER
+-------------------------------------------------------
+# Create another feature branch for different feature
+git checkout -b feature/add-logarithmic-functions
+
+# Add logarithmic functions
+cat >> calculator.js << 'EOF'
+
+// Logarithmic functions
+log: (x, base = Math.E) => {
+    if (x <= 0 || base <= 0 || base === 1) return 'Error: Invalid input for logarithm';
+    return Math.log(x) / Math.log(base);
+},
+ln: (x) => {
+    if (x <= 0) return 'Error: Invalid input for natural log';
+    return Math.log(x);
+},
+log10: (x) => {
+    if (x <= 0) return 'Error: Invalid input for log10';
+    return Math.log10(x);
+}
+EOF
+
+git add calculator.js
+git commit -m "feat: add logarithmic functions
+
+- Added log(x, base) function
+- Added ln(x) for natural logarithm
+- Added log10(x) for base-10 logarithm
+- Includes input validation"
+
+git push origin feature/add-logarithmic-functions
+
+STEP 19: SYNCHRONIZE WITH UPSTREAM WHILE FEATURE IN PROGRESS
+------------------------------------------------------------
+# Check for upstream changes while working on feature
+git fetch upstream
+
+# Rebase feature branch on updated main
+git rebase upstream/main
+
+# Continue development...
+
+GIT COMMANDS USED IN WORKFLOW:
+==============================
+1. Remote Management:
+   git remote add <name> <url>
+   git remote -v
+   git remote remove <name>
+   git remote set-url <name> <new-url>
+
+2. Branch Operations:
+   git checkout -b <branch>
+   git branch -v
+   git branch -d <branch>
+   git branch -D <branch> (force delete)
+   git branch --set-upstream-to=<remote>/<branch>
+
+3. Pushing and Pulling:
+   git push <remote> <branch>
+   git push --force-with-lease
+   git fetch <remote>
+   git pull <remote> <branch>
+   git pull --rebase <remote> <branch>
+
+4. Merge and Rebase:
+   git merge --no-ff <branch>
+   git rebase <base-branch>
+   git rebase --continue
+   git rebase --abort
+   git rebase --skip
+
+5. History Management:
+   git log --oneline --graph --all
+   git log --stat
+   git log -p
+   git show <commit>
+
+6. Conflict Resolution:
+   git status
+   git diff
+   git add <resolved-file>
+   git checkout --ours <file>
+   git checkout --theirs <file>
+
+7. Stashing:
+   git stash
+   git stash pop
+   git stash list
+   git stash apply
+   git stash drop
+
+BEST PRACTICES FOR COMMIT MESSAGES:
+===================================
+1. Use Conventional Commits format:
+   - feat: New feature
+   - fix: Bug fix
+   - docs: Documentation changes
+   - style: Code style changes (formatting, etc.)
+   - refactor: Code refactoring
+   - test: Adding or updating tests
+   - chore: Maintenance tasks
+
+2. Commit Message Structure:
+   - First line: <type>(<scope>): <subject> (50 chars max)
+   - Second line: blank
+   - Third line+: Body (wrap at 72 chars)
+
+3. Good Examples:
+   feat(calculator): add trigonometric functions
+   fix(validation): handle null input in divide function
+   docs(readme): update installation instructions
+
+4. Bad Examples:
+   "fixed stuff"
+   "update"
+   "changes"
+
+STRATEGY FOR HANDLING UPSTREAM CHANGES:
+=======================================
+1. Regular Synchronization:
+   - Fetch upstream changes daily
+   - Rebase feature branches frequently
+   - Avoid long-lived feature branches
+
+2. Rebase vs Merge:
+   - Use rebase for feature branches (clean history)
+   - Use merge for integrating to main (preserves context)
+
+3. Conflict Resolution Workflow:
+   git fetch upstream
+   git rebase upstream/main
+   # Resolve conflicts
+   git add <files>
+   git rebase --continue
+
+4. Safe Force Push:
+   Always use: git push --force-with-lease
+   Never use: git push --force (without lease)
+
+5. Branch Protection:
+   - Protect main branch
+   - Require pull requests
+   - Require reviews
+   - Require status checks
+
+REMOTE CONFIGURATION EXAMPLE:
+=============================
+After setup:
+origin    ../origin-repo.git (fetch)
+origin    ../origin-repo.git (push)
+upstream  ../upstream-repo.git (fetch)
+upstream  ../upstream-repo.git (push)
+
+FEATURE BRANCH WORKFLOW COMMANDS:
+=================================
+1. Start new feature:
+   git checkout -b feature/<name>
+   git push -u origin feature/<name>
+
+2. Work on feature:
+   # Make commits
+   git add <files>
+   git commit -m "type(scope): message"
+
+3. Keep feature updated:
+   git fetch upstream
+   git rebase upstream/main
+
+4. Push updates:
+   git push origin feature/<name>
+   # After rebase:
+   git push --force-with-lease origin feature/<name>
+
+5. Create pull request:
+   # Push to origin, then create PR via web interface
+
+6. Address review comments:
+   # Make requested changes
+   git add <files>
+   git commit --amend  # or new commit
+   git push --force-with-lease origin feature/<name>
+
+7. After merge:
+   git checkout main
+   git pull upstream main
+   git push origin main
+   git branch -d feature/<name>
+   git push origin --delete feature/<name>
+
+COMMON WORKFLOW SCENARIOS:
+==========================
+Scenario 1: Starting new feature
+   git fetch upstream
+   git checkout -b feature/xyz upstream/main
+
+Scenario 2: Updating feature with upstream changes
+   git fetch upstream
+   git rebase upstream/main
+   # Resolve conflicts if any
+
+Scenario 3: Multiple features in parallel
+   git stash
+   git checkout other-feature
+   # Work...
+   git checkout first-feature
+   git stash pop
+
+Scenario 4: Emergency hotfix
+   git checkout -b hotfix/xxx main
+   # Fix issue
+   git commit -m "fix: emergency fix for xxx"
+   git push origin hotfix/xxx
+   # Fast-track merge
+
+VERIFICATION:
+=============
+- [x] Set up multiple remotes (upstream and origin)
+- [x] Implemented feature branch workflow
+- [x] Created meaningful commits with good messages
+- [x] Practiced rebasing onto upstream changes
+- [x] Simulated pull request workflow
+- [x] Handled "review comments" with additional commits
+- [x] Used safe force push (--force-with-lease)
+- [x] Synchronized fork with upstream changes
+- [x] Cleaned up branches after merge
+
+TOOLS FOR BETTER GIT WORKFLOW:
+==============================
+1. Git GUI clients: GitHub Desktop, SourceTree, GitKraken
+2. IDE integrations: VS Code GitLens, IntelliJ Git
+3. CLI enhancements: tig, lazygit
+4. Git hooks: pre-commit, commit-msg
+5. CI/CD integration: GitHub Actions, GitLab CI
+
+CONCLUSION:
+===========
+The team Git workflow with multiple remotes is essential for
+collaborative development. Key takeaways:
+
+1. Always work in feature branches, never directly on main
+2. Keep feature branches short-lived and focused
+3. Rebase frequently to avoid merge conflicts
+4. Use meaningful commit messages following conventions
+5. Push safely with --force-with-lease
+6. Regularly sync your fork with upstream
+7. Clean up branches after they're merged
+
+This workflow ensures clean project history, reduces conflicts,
+and enables efficient collaboration in team environments.
