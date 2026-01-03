@@ -4,10 +4,8 @@ async function debugTask08() {
     console.log('=== Debug Task 08 ===');
     const service = new TodoService();
     
-    // Очищаем сервис
     service.clear();
     
-    // Создаем тестовые задачи как в реальном тесте
     await service.create('service task one');
     await service.create('service task two');
     
@@ -15,7 +13,6 @@ async function debugTask08() {
     const allTasks = await service.getAll();
     allTasks.forEach(t => console.log(`  - ${t.title}: ${t.status}`));
     
-    // Ищем задачи
     const found = await service.search('service');
     console.log('Found tasks with "service":', found.length);
     
@@ -27,7 +24,6 @@ async function debugTask08() {
             status: todo.status
         });
         
-        // Переключаем статус
         const toggled = await service.toggleStatus(todo.id);
         console.log('After toggle:', {
             original: todo.status,
