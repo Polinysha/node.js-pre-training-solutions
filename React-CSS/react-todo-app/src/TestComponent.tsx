@@ -1,4 +1,3 @@
-﻿// TestComponent.tsx - тестовый компонент для проверки
 import React from 'react';
 
 const TestComponent: React.FC = () => {
