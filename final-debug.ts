@@ -6,10 +6,8 @@ async function testTask08Scenario() {
     console.log('=== Testing Task 08 Scenario ===');
     const service = new TodoService();
     
-    // Симулируем чистый тест
     service.clear();
     
-    // Создаем задачи как в тесте
     await service.create('service task one');
     await service.create('service task two');
     
@@ -24,7 +22,6 @@ async function testTask08Scenario() {
         console.log('After toggle - status:', toggled.status);
         console.log('Status changed:', todo.status !== toggled.status);
         
-        // Это должно быть true для прохождения теста
         console.log('Test will pass:', toggled.status !== todo.status);
     }
 }
