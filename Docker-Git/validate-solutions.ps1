@@ -89,7 +89,7 @@ for ($i = 1; $i -le 10; $i++) {
     
     if ($result.Issues.Count -gt 0) {
         foreach ($issue in $result.Issues) {
-            Write-Host "  ⚠️  $issue" -ForegroundColor DarkYellow
+            Write-Host "   ️  $issue" -ForegroundColor DarkYellow
         }
     }
 }
@@ -109,7 +109,7 @@ Write-Host "Average Score: ${totalScore}%"
 if ($passed -eq 10) {
     Write-Host "`n✅ ALL TASKS PASSED VALIDATION" -ForegroundColor Green
 } else {
-    Write-Host "`n⚠️  SOME TASKS NEED ATTENTION" -ForegroundColor Yellow
+    Write-Host "`n ️  SOME TASKS NEED ATTENTION" -ForegroundColor Yellow
 }
 
 # Сохраняем отчет

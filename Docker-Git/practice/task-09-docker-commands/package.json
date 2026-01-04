@@ -1,16 +1,13 @@
 ﻿{
-  "name": "docker-commands-practice",
+  "name": "docker-commands-demo",
   "version": "1.0.0",
-  "description": "Practice files for Docker commands",
+  "description": "Demo app for Docker commands practice",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "redis-test": "node redis-test.js"
+    "test": "echo \"No tests specified\" && exit 0"
   },
-  "dependencies": {
-    "redis": "^4.6.0"
-  },
-  "keywords": ["docker", "practice", "commands"],
-  "author": "Student",
+  "keywords": ["docker", "commands", "training"],
+  "author": "Developer",
   "license": "MIT"
 }

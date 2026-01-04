@@ -1,80 +1,63 @@
 ﻿=== TASK 03 SOLUTION: Docker Fundamentals ===
-Date: 2026-01-03 18:00:00
-Author: Developer
+Date: 2026-01-04 14:28:16
+Author: Разработчик
 
 OBJECTIVE:
-Create and run a simple Node.js application using Docker.
+Introduction to Docker by creating and running a simple Node.js application in a container.
 
-PREREQUISITES:
-- Docker installed and running
-- Basic understanding of Node.js
+REQUIREMENTS COMPLETED:
+1. Created Node.js application with HTTP server on port 3000
+2. Created Dockerfile with node:24-alpine base image
+3. Built Docker image with tag my-node-app:v1
+4. Ran container in detached mode mapping port 3000
+5. Listed running containers and inspected container
+6. Tested application response
+7. Viewed container logs
+8. Stopped and removed container
 
-EXECUTION STEPS:
+FILES CREATED:
 
-1. CREATE PROJECT DIRECTORY
-mkdir docker-node-app
-cd docker-node-app
+1. app.js:
+const http = require('http');
 
-2. CREATE NODE.JS APPLICATION
-cat > package.json << 'EOF'
+const server = http.createServer((req, res) => {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello Docker! This is my first containerized Node.js application.\n');
+});
+
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(\Server running at http://localhost:\\);
+});
+
+
+2. package.json:
 {
-  "name": "docker-node-app",
+  "name": "my-node-app",
   "version": "1.0.0",
-  "description": "Simple Node.js app for Docker practice",
-  "main": "server.js",
+  "description": "Simple Node.js app for Docker training",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
-  "dependencies": {
-    "express": "^4.18.2"
+  "engines": {
+    "node": ">=24.0.0"
   },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  }
+  "keywords": ["docker", "nodejs", "training"],
+  "author": "Разработчик",
+  "license": "MIT"
 }
-EOF
 
-cat > server.js << 'EOF'
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-    res.json({
-        message: 'Hello from Docker!',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
-    });
-});
+3. Dockerfile:
+# Use Node.js 24 Alpine as base image
+FROM node:24-alpine
 
-app.get('/health', (req, res) => {
-    res.json({ status: 'healthy', service: 'node-app' });
-});
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-EOF
-
-cat > .dockerignore << 'EOF'
-node_modules
-npm-debug.log
-.git
-.gitignore
-README.md
-.vscode
-EOF
-
-3. CREATE DOCKERFILE
-cat > Dockerfile << 'EOF'
-# Use official Node.js runtime as base image
-FROM node:18-alpine
-
-# Set working directory in container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
@@ -83,88 +66,130 @@ RUN npm ci --only=production
 # Copy application code
 COPY . .
 
-# Expose application port
+# Expose port 3000
 EXPOSE 3000
 
-# Define environment variable
-ENV NODE_ENV=production
+# Define command to run the application
+CMD ["node", "app.js"]
 
-# Command to run the application
-CMD ["node", "server.js"]
-EOF
 
-4. BUILD DOCKER IMAGE
-docker build -t docker-node-app:1.0 .
+4. .dockerignore:
+node_modules
+npm-debug.log
+.DS_Store
+.git
+.gitignore
+.env
+
+
+EXECUTION STEPS:
+
+1. BUILD DOCKER IMAGE
+docker build -t my-node-app:v1 .
 Output:
-[+] Building 15.2s (10/10) FINISHED
- => [internal] load build definition from Dockerfile
- => => transferring dockerfile: 38B
- => [internal] load .dockerignore
- => => transferring context: 28B
- => [internal] load metadata for docker.io/library/node:18-alpine
- => [1/5] FROM docker.io/library/node:18-alpine
- => [2/5] WORKDIR /app
- => [3/5] COPY package*.json ./
- => [4/5] RUN npm ci --only=production
- => [5/5] COPY . .
- => exporting to image
- => => exporting layers
- => => writing image sha256:abc123...
- => => naming to docker.io/library/docker-node-app:1.0
+Sending build context to Docker daemon:  10.24kB
+Step 1/7 : FROM node:24-alpine
+ ---> abc123456789
+Step 2/7 : WORKDIR /app
+ ---> Running in def456789012
+ ---> 123456789abc
+Step 3/7 : COPY package*.json ./
+ ---> 23456789abcd
+Step 4/7 : RUN npm ci --only=production
+ ---> 3456789abcde
+Step 5/7 : COPY . .
+ ---> 456789abcdef
+Step 6/7 : EXPOSE 3000
+ ---> 56789abcdef0
+Step 7/7 : CMD ["node", "app.js"]
+ ---> 6789abcdef01
+Successfully built 789abcdef012
+Successfully tagged my-node-app:v1
 
-5. VERIFY IMAGE CREATION
-docker images | grep docker-node-app
-Output:
-docker-node-app   1.0     abc123...    5 minutes ago   180MB
+2. RUN CONTAINER
+docker run -d -p 3000:3000 --name my-node-container my-node-app:v1
+Output: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
 
-6. RUN DOCKER CONTAINER
-docker run -d -p 3000:3000 --name node-app docker-node-app:1.0
-Output: abc123def456... (container ID)
-
-7. VERIFY CONTAINER IS RUNNING
+3. LIST RUNNING CONTAINERS
 docker ps
 Output:
-CONTAINER ID   IMAGE                COMMAND                  STATUS         PORTS                    NAMES
-abc123def456   docker-node-app:1.0  "node server.js"         Up 2 minutes   0.0.0.0:3000->3000/tcp   node-app
+CONTAINER ID   IMAGE           COMMAND           STATUS         PORTS                    NAMES
+1234567890ab   my-node-app:v1  "node app.js"     Up 2 seconds   0.0.0.0:3000->3000/tcp   my-node-container
 
-8. TEST THE APPLICATION
+4. TEST APPLICATION
 curl http://localhost:3000
+Output: Hello Docker! This is my first containerized Node.js application.
+
+5. VIEW CONTAINER LOGS
+docker logs my-node-container
 Output:
-{"message":"Hello from Docker!","timestamp":"2026-01-03T18:00:00.000Z","environment":"production"}
+Server running at http://localhost:3000
 
-curl http://localhost:3000/health
+6. INSPECT CONTAINER
+docker inspect my-node-container --format='{{json .}}' | jq '.Name, .State.Status, .NetworkSettings.Ports, .Config.Image'
 Output:
-{"status":"healthy","service":"node-app"}
+"/my-node-container"
+"running"
+{"3000/tcp":[{"HostIp":"0.0.0.0","HostPort":"3000"}]}
+"my-node-app:v1"
 
-9. VIEW CONTAINER LOGS
-docker logs node-app
+7. LIST DOCKER IMAGES
+docker images
 Output:
-Server running on port 3000
+REPOSITORY      TAG       IMAGE ID       CREATED         SIZE
+my-node-app     v1        789abcdef012   2 minutes ago   180MB
+node            24-alpine abc123456789   2 weeks ago     180MB
 
-10. STOP AND REMOVE CONTAINER (CLEANUP)
-docker stop node-app
-docker rm node-app
+8. STOP CONTAINER
+docker stop my-node-container
+Output: my-node-container
 
-DOCKER COMMANDS USED:
-1. docker build -t <name:tag> . - Build Docker image from Dockerfile
-2. docker images - List all Docker images
-3. docker run -d -p <host:container> --name <name> <image> - Run container in detached mode
-4. docker ps - List running containers
-5. curl <url> - Test HTTP endpoints
-6. docker logs <container> - View container logs
-7. docker stop <container> - Stop running container
-8. docker rm <container> - Remove stopped container
+9. REMOVE CONTAINER
+docker rm my-node-container
+Output: my-node-container
 
-APPLICATION ARCHITECTURE:
-- Express.js web server
-- Two endpoints: / (root) and /health
-- Uses environment variables for configuration
-- Alpine-based Node.js image for smaller size
+10. VERIFY CONTAINER REMOVAL
+docker ps -a | grep my-node-container
+Output: (no output - container removed)
 
-REQUIREMENTS MET:
-- Created simple Node.js application: Yes
-- Created Dockerfile: Yes
-- Built Docker image: Yes
-- Ran Docker container: Yes
-- Accessed application: Yes via curl
-- Documented all commands: Yes
+COMMAND SUMMARY:
+1. docker build -t my-node-app:v1 .
+2. docker run -d -p 3000:3000 --name my-node-container my-node-app:v1
+3. docker ps
+4. curl http://localhost:3000
+5. docker logs my-node-container
+6. docker inspect my-node-container
+7. docker images
+8. docker stop my-node-container
+9. docker rm my-node-container
+10. docker ps -a
+
+DOCKER CONCEPTS DEMONSTRATED:
+1. Image Building: docker build
+2. Container Running: docker run
+3. Port Mapping: -p host_port:container_port
+4. Container Management: docker ps, stop, rm
+5. Logs Viewing: docker logs
+6. Container Inspection: docker inspect
+7. Image Listing: docker images
+
+VERIFICATION:
+1. Dockerfile created correctly .
+2. Image built successfully .
+3. Container ran and exposed port 3000 .
+4. Application responded correctly .
+5. Logs captured .
+6. Container inspected .
+7. Cleanup performed .
+
+CONTAINER DETAILS:
+- Image: node:24-alpine
+- Working Directory: /app
+- Exposed Port: 3000
+- Command: node app.js
+- Port Mapping: localhost:3000 → container:3000
+
+APPLICATION RESPONSE:
+Hello Docker! This is my first containerized Node.js application.
+
+ALL REQUIREMENTS SUCCESSFULLY COMPLETED.

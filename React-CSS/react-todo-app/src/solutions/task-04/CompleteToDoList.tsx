@@ -75,7 +75,7 @@ export const CompleteToDoList: React.FC = () => {
               }}
             >
               {todo.title}
-              {todo.completed && ' ✓'}
+              {todo.completed && ' .'}
             </span>
             
             <button

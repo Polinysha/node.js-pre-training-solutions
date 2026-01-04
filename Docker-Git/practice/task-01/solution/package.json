@@ -1,0 +1,12 @@
+﻿{
+  "name": "my-first-repo",
+  "version": "1.0.0",
+  "description": "My first Git repository for training purposes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": ["git", "training", "repository"],
+  "author": "Your Name",
+  "license": "MIT"
+}

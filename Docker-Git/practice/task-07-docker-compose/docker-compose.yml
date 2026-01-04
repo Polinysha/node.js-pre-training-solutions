@@ -1,6 +1,29 @@
 ﻿version: '3.8'
 
 services:
+  # PostgreSQL Database Service
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: postgres-db-service
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   # Node.js API Service
   node-api:
     build: ./node-api
@@ -8,13 +31,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=secretpassword
-      - DB_NAME=appdb
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: secretpassword
+      DB_NAME: appdb
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -28,36 +51,13 @@ services:
       retries: 3
       start_period: 40s
 
-  # PostgreSQL Database Service
-  postgres-db:
-    image: postgres:16-alpine
-    container_name: postgres-database
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=secretpassword
-      - POSTGRES_DB=appdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
-    networks:
-      - app-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-  # pgAdmin Database Management
+  # pgAdmin Service for Database Management
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: pgadmin-web
+    container_name: pgadmin-service
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@example.com
-      - PGADMIN_DEFAULT_PASSWORD=adminpassword
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
     ports:
       - "5050:80"
     volumes:
@@ -67,21 +67,13 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres-db
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-# Custom network for communication between services
 networks:
   app-network:
     driver: bridge
-    name: app-network
 
-# Persistent volumes for data
 volumes:
   postgres-data:
-    name: postgres-docker-compose-data
+    driver: local
   pgadmin-data:
-    name: pgadmin-docker-compose-data
+    driver: local

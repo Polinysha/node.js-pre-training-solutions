@@ -1,13 +1,17 @@
 ﻿{
   "name": "calculator-project",
   "version": "1.0.0",
-  "description": "Calculator project for Git workflow practice",
+  "description": "Calculator project for Git workflow training",
   "main": "calculator.js",
   "scripts": {
-    "test": "node calculator.test.js",
-    "start": "node example.js"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
-  "keywords": ["calculator", "git", "workflow", "practice"],
-  "author": "Student",
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "keywords": ["calculator", "git", "workflow", "scientific"],
+  "author": "Team",
   "license": "MIT"
 }
