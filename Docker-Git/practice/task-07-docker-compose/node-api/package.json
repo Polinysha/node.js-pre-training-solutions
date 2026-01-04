@@ -1,19 +1,24 @@
 ﻿{
   "name": "node-api-docker-compose",
   "version": "1.0.0",
-  "description": "Node.js API for Docker Compose practice",
+  "description": "Node.js API for Docker Compose demonstration",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "test": "jest"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.0",
+    "pg": "^8.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.0"
   },
-  "keywords": ["docker", "compose", "nodejs", "postgres"],
-  "author": "Student",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "keywords": ["docker", "compose", "nodejs", "postgresql"],
+  "author": "Разработчик",
   "license": "MIT"
 }

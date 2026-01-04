@@ -1,14 +1,14 @@
-﻿# Use Node.js 24 Alpine as base image (small and efficient)
+﻿# Use Node.js 24 Alpine as base image
 FROM node:24-alpine
 
-# Set working directory inside container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if exists)
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --production
+RUN npm ci --only=production
 
 # Copy application code
 COPY . .

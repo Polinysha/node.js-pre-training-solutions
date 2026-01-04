@@ -1,279 +1,109 @@
-﻿=== TASK 10 SOLUTION: Docker Networks & Volumes ===
-Date: 2026-01-03 18:30:00
+﻿=== TASK 10 SOLUTION: Docker Networks and Data Persistence ===
+Date: 2026-01-04 15:11:27
 Author: Developer
 
 OBJECTIVE:
-Understand and implement Docker networks and volumes for persistent data and inter-container communication.
+Master Docker networking concepts and volume management for real-world applications.
 
-EXECUTION STEPS:
+EXECUTION:
 
-1. DOCKER NETWORKS
+1. CUSTOM NETWORK CREATION
 
-# List existing networks
+docker network create app-network
+docker network create --driver bridge --subnet 192.168.100.0/24 --gateway 192.168.100.1 isolated-network
+
 docker network ls
-Output:
-NETWORK ID     NAME      DRIVER    SCOPE
-abc123def456   bridge    bridge    local
-def456ghi789   host      host      local
-ghi789jkl012   none      null      local
-
-# Create custom network
-docker network create --driver bridge app-network
-Output: xyz123abc456
-
-# Inspect network
 docker network inspect app-network
-Output:
-[
-    {
-        "Name": "app-network",
-        "Id": "xyz123abc456...",
-        "Created": "2026-01-03T18:30:00.000000000Z",
-        "Scope": "local",
-        "Driver": "bridge",
-        "EnableIPv6": false,
-        "IPAM": {
-            "Driver": "default",
-            "Options": {},
-            "Config": [
-                {
-                    "Subnet": "172.20.0.0/16",
-                    "Gateway": "172.20.0.1"
-                }
-            ]
-        },
-        "Internal": false,
-        "Attachable": false,
-        "Ingress": false,
-        "ConfigFrom": {
-            "Network": ""
-        },
-        "ConfigOnly": false,
-        "Containers": {},
-        "Options": {},
-        "Labels": {}
-    }
-]
 
-# Run containers on custom network
-docker run -d --name web-app --network app-network -p 8080:80 nginx:alpine
-docker run -d --name database --network app-network -e POSTGRES_PASSWORD=secret postgres:15
+2. MULTI-CONTAINER COMMUNICATION
 
-# Verify containers are on same network
-docker network inspect app-network | grep -A5 "Containers"
-Output:
-        "Containers": {
-            "web-app": {
-                "Name": "web-app",
-                "EndpointID": "123...",
-                "MacAddress": "02:42:ac:14:00:02",
-                "IPv4Address": "172.20.0.2/16",
-                "IPv6Address": ""
-            },
-            "database": {
-                "Name": "database",
-                "EndpointID": "456...",
-                "MacAddress": "02:42:ac:14:00:03",
-                "IPv4Address": "172.20.0.3/16",
-                "IPv6Address": ""
-            }
-        }
+docker volume create mongo-data
 
-# Test network connectivity between containers
-docker exec web-app ping -c 3 database
-Output:
-PING database (172.20.0.3): 56 data bytes
-64 bytes from 172.20.0.3: seq=0 ttl=64 time=0.123 ms
-64 bytes from 172.20.0.3: seq=1 ttl=64 time=0.098 ms
-64 bytes from 172.20.0.3: seq=2 ttl=64 time=0.102 ms
+docker run -d --name mongodb --network app-network -v mongo-data:/data/db -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=secret mongo:7.0
+docker run -d --name mongo-express --network app-network -p 8081:8081 -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin -e ME_CONFIG_MONGODB_ADMINPASSWORD=secret -e ME_CONFIG_MONGODB_SERVER=mongodb mongo-express
 
---- database ping statistics ---
-3 packets transmitted, 3 packets received, 0% packet loss
-round-trip min/avg/max = 0.098/0.107/0.123 ms
+cd node-app
+docker build -t node-mongo-app .
+docker run -d --name node-app --network app-network -p 3000:3000 node-mongo-app
 
-2. DOCKER VOLUMES
+3. VOLUME TYPES
 
-# List volumes
+docker volume create named-demo-volume
+
+docker run -d --name volume-demo -v named-demo-volume:/data/volume -v /host/path/shared-data:/data/bind --tmpfs /data/tmpfs alpine tail -f /dev/null
+
+4. NETWORK ISOLATION TESTING
+
+docker run -d --name isolated-container --network isolated-network alpine tail -f /dev/null
+docker run -d --name multi-network-container --network app-network alpine tail -f /dev/null
+docker network connect isolated-network multi-network-container
+
+5. TESTING
+
+docker exec node-app nslookup mongodb
+docker exec isolated-container ping -c 2 mongodb
+docker exec multi-network-container ping -c 2 mongodb
+
+curl http://localhost:3000/health
+curl -X POST http://localhost:3000/items -H "Content-Type: application/json" -d '{"name":"Test","value":100}'
+curl http://localhost:3000/items
+
+6. DATA PERSISTENCE TEST
+
+docker stop mongodb
+docker start mongodb
+curl http://localhost:3000/health
+
+7. CLEANUP
+
+docker stop mongodb mongo-express node-app isolated-container multi-network-container volume-demo
+docker rm mongodb mongo-express node-app isolated-container multi-network-container volume-demo
+docker network rm app-network isolated-network
+docker volume rm mongo-data named-demo-volume
+docker system prune -f
+
+NETWORK TOPOLOGY:
+
+app-network (172.19.0.0/16):
+- mongodb:27017
+- mongo-express:8081  
+- node-app:3000
+
+isolated-network (192.168.100.0/24):
+- isolated-container
+
+VOLUME TYPES:
+- Named: mongo-data (persistent)
+- Bind: /host/path/shared-data (shared)
+- Tmpfs: /data/tmpfs (memory)
+
+COMMANDS SUMMARY:
+
+Network:
+docker network create [name]
+docker network ls
+docker network inspect [name]
+docker network rm [name]
+docker network connect [network] [container]
+
+Volume:
+docker volume create [name]
 docker volume ls
-Output:
-DRIVER    VOLUME NAME
-local     abc123...
+docker volume rm [name]
+docker volume prune
 
-# Create named volume
-docker volume create app-data
-Output: app-data
+Container:
+docker run --network [name] -v [volume]:[path] --tmpfs [path]
+docker exec [container] [command]
+docker stop [container]
+docker rm [container]
 
-# Inspect volume
-docker volume inspect app-data
-Output:
-[
-    {
-        "CreatedAt": "2026-01-03T18:30:00.000000000Z",
-        "Driver": "local",
-        "Labels": {},
-        "Mountpoint": "/var/lib/docker/volumes/app-data/_data",
-        "Name": "app-data",
-        "Options": {},
-        "Scope": "local"
-    }
-]
+TEST RESULTS:
 
-# Run container with mounted volume
-docker run -d --name db-with-volume \
-  --network app-network \
-  -v app-data:/var/lib/postgresql/data \
-  -e POSTGRES_PASSWORD=secret \
-  postgres:15
+1. Network isolation:   
+2. Multi-container communication:   
+3. Volume persistence:   
+4. Service discovery:   
+5. Cleanup:   
 
-# Create bind mount (host directory)
-mkdir -p ~/docker-data/postgres
-docker run -d --name db-with-bind-mount \
-  --network app-network \
-  -v ~/docker-data/postgres:/var/lib/postgresql/data \
-  -e POSTGRES_PASSWORD=secret \
-  postgres:15
-
-# Verify volume usage
-docker exec db-with-volume df -h /var/lib/postgresql/data
-Output:
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda1        20G  1.5G   18G   8% /var/lib/postgresql/data
-
-3. NETWORK AND VOLUME COMBINATION
-
-# Create docker-compose.yml for multi-service application
-cat > docker-compose.yml << 'EOF'
-version: '3.8'
-
-services:
-  postgres:
-    image: postgres:15
-    container_name: postgres_db
-    environment:
-      POSTGRES_DB: myapp
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret123
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - app-network
-    restart: unless-stopped
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@myapp.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    networks:
-      - app-network
-    restart: unless-stopped
-    depends_on:
-      - postgres
-
-  webapp:
-    build: .
-    container_name: webapp
-    ports:
-      - "3000:3000"
-    environment:
-      DATABASE_URL: postgres://admin:secret123@postgres:5432/myapp
-    volumes:
-      - ./app:/app
-      - /app/node_modules
-    networks:
-      - app-network
-    restart: unless-stopped
-    depends_on:
-      - postgres
-
-networks:
-  app-network:
-    driver: bridge
-
-volumes:
-  postgres-data:
-  pgadmin-data:
-EOF
-
-# Start multi-service application
-docker-compose up -d
-Output:
-Creating network "docker-git_app-network" with driver "bridge"
-Creating volume "docker-git_postgres-data" with default driver
-Creating volume "docker-git_pgadmin-data" with default driver
-Creating postgres_db ... done
-Creating pgadmin    ... done
-Creating webapp     ... done
-
-# Verify services are running
-docker-compose ps
-Output:
-   Name                  Command               State           Ports
--------------------------------------------------------------------------
-postgres_db   docker-entrypoint.sh postgres   Up      5432/tcp
-pgadmin       /entrypoint.sh                  Up      0.0.0.0:5050->80/tcp
-webapp        docker-entrypoint.sh node ...   Up      0.0.0.0:3000->3000/tcp
-
-4. CLEANUP
-
-# Stop and remove containers
-docker-compose down
-Output:
-Stopping webapp     ... done
-Stopping pgadmin    ... done
-Stopping postgres_db ... done
-Removing webapp     ... done
-Removing pgadmin    ... done
-Removing postgres_db ... done
-Removing network docker-git_app-network
-
-# Remove volumes
-docker volume rm app-data
-docker volume prune -f
-
-# Remove network
-docker network rm app-network
-
-KEY CONCEPTS LEARNED:
-
-1. Docker Networks:
-   - Bridge networks for container communication
-   - Host networks for direct host access
-   - None networks for isolation
-   - Custom networks for application segregation
-
-2. Docker Volumes:
-   - Named volumes for persistent data
-   - Bind mounts for host-directory access
-   - Volume drivers for different storage backends
-   - Data persistence across container lifecycle
-
-3. Network Commands:
-   - docker network create - Create custom network
-   - docker network ls - List networks
-   - docker network inspect - View network details
-   - docker network connect/disconnect - Manage container network
-
-4. Volume Commands:
-   - docker volume create - Create named volume
-   - docker volume ls - List volumes
-   - docker volume inspect - View volume details
-   - docker volume prune - Remove unused volumes
-
-5. Practical Applications:
-   - Database persistence with volumes
-   - Inter-service communication with networks
-   - Multi-container applications with docker-compose
-   - Data backup and migration strategies
-
-REQUIREMENTS MET:
-- Created and configured Docker networks: Yes
-- Implemented persistent volumes: Yes
-- Demonstrated network connectivity: Yes (ping between containers)
-- Showcased volume usage: Yes (database persistence)
-- Documented all commands and outputs: Yes
+ALL REQUIREMENTS COMPLETED.

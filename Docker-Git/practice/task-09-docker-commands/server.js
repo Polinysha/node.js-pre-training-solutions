@@ -1,24 +1,33 @@
-﻿// server.js - Simple Node.js server for Docker practice
-const http = require('http');
+﻿const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
 const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello from Node.js container!\n' +
-            'Container ID: ' + process.env.HOSTNAME + '\n' +
-            'Time: ' + new Date().toISOString());
+    if (req.url === '/') {
+        fs.readFile(path.join(__dirname, 'index.html'), (err, data) => {
+            if (err) {
+                res.writeHead(500);
+                res.end('Error loading page');
+                return;
+            }
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.end(data);
+        });
+    } else if (req.url === '/health') {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({
+            status: 'healthy',
+            service: 'docker-commands-demo',
+            timestamp: new Date().toISOString()
+        }));
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
+    }
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = 3000;
 server.listen(PORT, () => {
-    console.log(\Node.js server running on port \\);
-    console.log('Press Ctrl+C to stop');
-});
-
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
-    server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-    });
+    console.log(\Server running on port \\);
+    console.log(\Health check: http://localhost:\/health\);
 });

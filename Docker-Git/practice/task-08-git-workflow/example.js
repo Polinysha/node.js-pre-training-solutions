@@ -1,10 +1,24 @@
-﻿// example.js - Example usage of calculator
-const calculator = require('./calculator');
+﻿// Example usage of Calculator with scientific functions
+const Calculator = require('./calculator.js');
 
-console.log('Calculator Examples:');
-console.log('2 + 3 =', calculator.add(2, 3));
-console.log('10 - 4 =', calculator.subtract(10, 4));
-console.log('6 * 7 =', calculator.multiply(6, 7));
-console.log('20 / 4 =', calculator.divide(20, 4));
-console.log('2^8 =', calculator.power(2, 8));
-console.log('√144 =', calculator.squareRoot(144));
+const calc = new Calculator();
+
+console.log('=== Calculator Scientific Functions Demo ===\n');
+
+console.log('Basic Operations:');
+console.log(\5 + 3 = \\);
+console.log(\10 - 4 = \\);
+console.log(\7 * 6 = \\);
+console.log(\20 / 4 = \\n\);
+
+console.log('Scientific Functions:');
+console.log(\2^3 (power) = \\);
+console.log(\√16 (square root) = \\);
+console.log(\5! (factorial) = \\n\);
+
+console.log('Memory Functions:');
+console.log(\Last result: \\);
+calc.reset();
+console.log(\After reset: \\);
+
+console.log('\n=== Demo Complete ===');
