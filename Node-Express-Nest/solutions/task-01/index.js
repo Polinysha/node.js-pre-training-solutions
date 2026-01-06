@@ -2,7 +2,6 @@
 
 const PORT = process.env.PORT || 3000;
 
-// Handle graceful shutdown
 process.on('SIGTERM', () => {
     console.log('SIGTERM signal received: closing HTTP server');
     server.close(() => {
