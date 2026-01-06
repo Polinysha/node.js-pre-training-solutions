@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 interface Todo {
   id: number;
@@ -49,7 +49,7 @@ export const FilteredToDoList: React.FC = () => {
 
   return (
     <div>
-      {/* Форма добавления */}
+      {/* Add Form */}
       <div style={{ marginBottom: '20px' }}>
         <input
           type="text"
@@ -66,7 +66,7 @@ export const FilteredToDoList: React.FC = () => {
         </button>
       </div>
 
-      {/* Кнопки фильтрации */}
+      {/* Filter Buttons */}
       <div style={{ marginBottom: '20px' }}>
         <button
           onClick={() => setFilter('all')}
@@ -102,7 +102,7 @@ export const FilteredToDoList: React.FC = () => {
         </button>
       </div>
 
-      {/* Список задач */}
+      {/* Todo List */}
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {filteredTodos.map(todo => (
           <li
@@ -145,7 +145,7 @@ export const FilteredToDoList: React.FC = () => {
         ))}
       </ul>
 
-      {/* Статистика БЕЗ слова "Active" */}
+      {/* Statistics WITHOUT the word "Active" */}
       <div style={{ marginTop: '20px', color: '#666' }}>
         Total: {todos.length} | Not done: {activeCount} | Done: {completedCount}
       </div>
