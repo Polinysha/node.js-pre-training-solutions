@@ -3,20 +3,9 @@ const { body, param, query, validationResult } = require('express-validator');
 const app = express();
 const PORT = 3001;
 
-/**
- * Task 2: Params and Queries Challenge with Validation
- * Create a route `/users/:id?active=true`
- * - Extract both `req.params` and `req.query`
- * - Validate:
- *   - `id` must be a number
- *   - `active` must be `"true"` or `"false"`
- * Return a message like: `User 42 is active`.
- */
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Custom validation middleware
 const validateRequest = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -32,7 +21,6 @@ const validateRequest = (req, res, next) => {
     next();
 };
 
-// In-memory user database for demonstration
 const users = [
     { id: 1, name: 'Alice', active: true, email: 'alice@example.com' },
     { id: 2, name: 'Bob', active: false, email: 'bob@example.com' },
@@ -41,17 +29,14 @@ const users = [
     { id: 5, name: 'Eve', active: false, email: 'eve@example.com' }
 ];
 
-// Route for Task 2
 app.get(
     '/users/:id',
     [
-        // Validate params
         param('id')
             .isInt({ min: 1 })
             .withMessage('ID must be a positive integer')
             .toInt(),
         
-        // Validate query parameters
         query('active')
             .optional()
             .isIn(['true', 'false'])
@@ -93,7 +78,6 @@ app.get(
         console.log(`  Params: id=${userId}`);
         console.log(`  Query: active=${active}, fields=${fields}, limit=${limit}, page=${page}`);
         
-        // Find user by ID
         const user = users.find(u => u.id === userId);
         
         if (!user) {
@@ -103,7 +87,6 @@ app.get(
             });
         }
         
-        // Filter by active status if provided
         if (active !== undefined && user.active !== active) {
             return res.status(404).json({
                 success: false,
@@ -111,7 +94,6 @@ app.get(
             });
         }
         
-        // Filter fields if requested
         let responseUser = { ...user };
         if (fields) {
             const requestedFields = fields.split(',').map(f => f.trim());
@@ -123,7 +105,6 @@ app.get(
             });
         }
         
-        // Prepare response message as requested
         const statusMessage = user.active ? 'is active' : 'is inactive';
         const message = `User ${userId} ${statusMessage}`;
         
@@ -142,9 +123,6 @@ app.get(
     }
 );
 
-// Additional routes for demonstration
-
-// GET all users with filtering and pagination
 app.get(
     '/users',
     [
@@ -185,7 +163,6 @@ app.get(
         console.log(`[Request] GET /users`);
         console.log(`  Query: active=${active}, search=${search}, limit=${limit}, page=${page}, sort=${sort}`);
         
-        // Filter users
         let filteredUsers = [...users];
         
         if (active !== undefined) {
@@ -200,19 +177,16 @@ app.get(
             );
         }
         
-        // Sort users
         filteredUsers.sort((a, b) => {
             if (sort === 'name') return a.name.localeCompare(b.name);
             if (sort === 'active') return (a.active === b.active) ? 0 : a.active ? -1 : 1;
-            return a.id - b.id; // default sort by id
+            return a.id - b.id; 
         });
         
-        // Pagination
         const startIndex = (page - 1) * limit;
         const endIndex = startIndex + limit;
         const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
         
-        // Calculate pagination metadata
         const totalPages = Math.ceil(filteredUsers.length / limit);
         
         res.json({
@@ -236,7 +210,6 @@ app.get(
     }
 );
 
-// POST create user with validation
 app.post(
     '/users',
     [
@@ -270,7 +243,6 @@ app.post(
         console.log(`[Request] POST /users`);
         console.log(`  Body: name=${name}, email=${email}, active=${active}`);
         
-        // Check if email already exists
         if (users.some(user => user.email === email)) {
             return res.status(400).json({
                 success: false,
@@ -278,7 +250,6 @@ app.post(
             });
         }
         
-        // Create new user
         const newUser = {
             id: users.length + 1,
             name: name,
@@ -297,7 +268,6 @@ app.post(
     }
 );
 
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error('[Error]', err.message);
     
@@ -310,7 +280,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -321,7 +290,6 @@ app.use((req, res) => {
     });
 });
 
-// Start server
 app.listen(PORT, () => {
     console.log('='.repeat(50));
     console.log('Params & Queries Challenge Server');
