@@ -1,6 +1,5 @@
 const request = require('supertest');
 
-// ???? ????????????? ??????????
 delete require.cache[require.resolve('./index')];
 const app = require('./index');
 
@@ -35,7 +34,6 @@ describe('Task 10: GET /todos/search', () => {
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
     
-    // ?????????, ??? ??? ????????? todos ????? completed: true
     if (response.body.length > 0) {
       response.body.forEach(todo => {
         expect(todo.completed).toBe(true);
@@ -48,7 +46,6 @@ describe('Task 10: GET /todos/search', () => {
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
     
-    // ?????????, ??? ??? ????????? todos ????? completed: false
     if (response.body.length > 0) {
       response.body.forEach(todo => {
         expect(todo.completed).toBe(false);
