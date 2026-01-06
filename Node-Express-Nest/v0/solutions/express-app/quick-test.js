@@ -1,4 +1,3 @@
-﻿// quick-test.js - быстрая проверка всех endpoint
 const http = require('http');
 
 const testCases = [
@@ -64,7 +63,7 @@ function makeRequest(method, path, data = null) {
 }
 
 async function runTests() {
-    console.log('🧪 ТЕСТИРУЕМ ВСЕ ENDPOINT\n');
+    console.log(' ТЕСТИРУЕМ ВСЕ ENDPOINT\n');
     
     for (const test of testCases) {
         console.log(\\...\);
@@ -79,13 +78,11 @@ async function runTests() {
             console.log(\   . \ - \\);
         }
         
-        // Пауза между запросами
         await new Promise(r => setTimeout(r, 100));
     }
     
     console.log('\n. ТЕСТИРОВАНИЕ ЗАВЕРШЕНО');
-    console.log('👉 Откройте браузер: http://localhost:3000/todos');
+    console.log(' Откройте браузер: http://localhost:3000/todos');
 }
 
-// Ждем 2 секунды чтобы сервер запустился
 setTimeout(runTests, 2000);
