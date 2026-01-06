@@ -1,6 +1,5 @@
 ﻿import { ToDoManager } from './todo-manager';
 
-// Глобальная переменная для сохранения состояния между командами
 let manager: ToDoManager | null = null;
 
 async function main() {
