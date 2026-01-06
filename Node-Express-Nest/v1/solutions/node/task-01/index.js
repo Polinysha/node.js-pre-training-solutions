@@ -8,13 +8,12 @@ class MessagingSystem extends EventEmitter {
     this.MAX_HISTORY = 10;
   }
 
-  // User management
   addUser(username) {
     if (typeof username !== 'string' || username.trim() === '') {
       throw new Error('Username must be a non-empty string');
     }
     if (this.activeUsers.has(username)) {
-      return false; // уже существует
+      return false; 
     }
     this.activeUsers.add(username);
     this.emit('user-joined', { username, timestamp: new Date() });
@@ -37,7 +36,6 @@ class MessagingSystem extends EventEmitter {
     return this.activeUsers.size;
   }
 
-  // Messaging
   sendMessage(type, content, sender = 'system') {
     const validTypes = ['message', 'notification', 'alert'];
     if (!validTypes.includes(type)) {
@@ -60,7 +58,6 @@ class MessagingSystem extends EventEmitter {
       this.messageHistory.shift();
     }
 
-    // Emit events
     this.emit('message', message);
     this.emit(type, message);
 
@@ -75,7 +72,6 @@ class MessagingSystem extends EventEmitter {
     this.on(type, callback);
   }
 
-  // History & stats
   getMessageHistory() {
     return [...this.messageHistory];
   }
