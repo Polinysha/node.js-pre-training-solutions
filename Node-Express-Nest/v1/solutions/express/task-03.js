@@ -2,13 +2,6 @@
 const app = express();
 const PORT = 3002;
 
-/**
- * Task 3: Centralized Error Handler
- * Throw errors from routes and handle them using a custom error middleware.
- * Format the output as `{ status, message, timestamp }`.
- */
-
-// Custom Error Classes
 class AppError extends Error {
     constructor(message, statusCode = 500) {
         super(message);
@@ -38,7 +31,6 @@ class UnauthorizedError extends AppError {
     }
 }
 
-// Global error handling middleware
 const errorHandler = (err, req, res, next) => {
     console.error(`[Error Handler] ${err.message}`);
     
@@ -51,13 +43,11 @@ const errorHandler = (err, req, res, next) => {
         timestamp: new Date().toISOString()
     };
     
-    // Add stack trace in development
     if (process.env.NODE_ENV === 'development') {
         errorResponse.stack = err.stack;
         errorResponse.name = err.name;
     }
     
-    // Add validation errors if any
     if (err.errors) {
         errorResponse.errors = err.errors;
     }
@@ -65,14 +55,12 @@ const errorHandler = (err, req, res, next) => {
     res.status(statusCode).json(errorResponse);
 };
 
-// Custom middleware to log requests
 const requestLogger = (req, res, next) => {
     req.requestTime = new Date().toISOString();
     console.log(`[${req.requestTime}] ${req.method} ${req.url}`);
     next();
 };
 
-// Middleware to simulate authentication
 const authenticate = (req, res, next) => {
     const token = req.headers['authorization'];
     
@@ -80,7 +68,6 @@ const authenticate = (req, res, next) => {
         return next(new UnauthorizedError('Authorization token is required'));
     }
     
-    // Simulate token validation
     if (token !== 'Bearer valid-token') {
         return next(new UnauthorizedError('Invalid authorization token'));
     }
@@ -89,7 +76,6 @@ const authenticate = (req, res, next) => {
     next();
 };
 
-// Middleware to validate request body
 const validateCreateUser = (req, res, next) => {
     const { name, email } = req.body;
     
@@ -112,16 +98,12 @@ const validateCreateUser = (req, res, next) => {
 app.use(express.json());
 app.use(requestLogger);
 
-// In-memory database
 let users = [
     { id: 1, name: 'Alice', email: 'alice@example.com' },
     { id: 2, name: 'Bob', email: 'bob@example.com' }
 ];
 let nextId = 3;
 
-// Routes that throw errors
-
-// GET /users - Get all users
 app.get('/users', (req, res, next) => {
     if (users.length === 0) {
         return next(new NotFoundError('No users found'));
@@ -135,7 +117,6 @@ app.get('/users', (req, res, next) => {
     });
 });
 
-// GET /users/:id - Get user by ID
 app.get('/users/:id', (req, res, next) => {
     const userId = parseInt(req.params.id);
     
@@ -156,11 +137,9 @@ app.get('/users/:id', (req, res, next) => {
     });
 });
 
-// POST /users - Create new user
 app.post('/users', validateCreateUser, (req, res, next) => {
     const { name, email } = req.body;
     
-    // Check if email already exists
     if (users.some(u => u.email === email)) {
         return next(new ValidationError(`User with email ${email} already exists`));
     }
@@ -182,7 +161,6 @@ app.post('/users', validateCreateUser, (req, res, next) => {
     });
 });
 
-// PUT /users/:id - Update user
 app.put('/users/:id', authenticate, (req, res, next) => {
     const userId = parseInt(req.params.id);
     const { name, email } = req.body;
@@ -206,7 +184,6 @@ app.put('/users/:id', authenticate, (req, res, next) => {
         return next(new ValidationError(`Email ${email} is already in use`));
     }
     
-    // Update user
     users[userIndex] = {
         ...users[userIndex],
         ...(name && { name }),
@@ -222,7 +199,6 @@ app.put('/users/:id', authenticate, (req, res, next) => {
     });
 });
 
-// DELETE /users/:id - Delete user
 app.delete('/users/:id', authenticate, (req, res, next) => {
     const userId = parseInt(req.params.id);
     
@@ -246,7 +222,6 @@ app.delete('/users/:id', authenticate, (req, res, next) => {
     });
 });
 
-// GET /protected - Protected route
 app.get('/protected', authenticate, (req, res) => {
     res.json({
         success: true,
@@ -256,9 +231,7 @@ app.get('/protected', authenticate, (req, res) => {
     });
 });
 
-// GET /error - Route that intentionally throws an error
 app.get('/error', (req, res, next) => {
-    // Simulate different types of errors
     const errorType = req.query.type || 'generic';
     
     switch (errorType) {
@@ -272,7 +245,6 @@ app.get('/error', (req, res, next) => {
             next(new UnauthorizedError('Custom unauthorized error'));
             break;
         case 'database':
-            // Simulate database error
             const dbError = new Error('Database connection failed');
             dbError.statusCode = 503;
             next(dbError);
@@ -282,15 +254,12 @@ app.get('/error', (req, res, next) => {
     }
 });
 
-// 404 handler - catches all unhandled routes
 app.all('*', (req, res, next) => {
     next(new NotFoundError(`Cannot ${req.method} ${req.url}`));
 });
 
-// Use the global error handler (must be last middleware)
 app.use(errorHandler);
 
-// Start server
 app.listen(PORT, () => {
     console.log('='.repeat(50));
     console.log('Centralized Error Handler Server');
