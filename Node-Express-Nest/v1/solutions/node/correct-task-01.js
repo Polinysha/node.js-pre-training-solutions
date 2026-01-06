@@ -20,7 +20,6 @@ class MessageSystem extends EventEmitter {
     this.messageHistory.push(message);
     this.totalMessages++;
 
-    // Keep only last 10 messages
     if (this.messageHistory.length > 10) {
       this.messageHistory.shift();
     }
