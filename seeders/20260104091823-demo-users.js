@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -25,79 +25,79 @@ module.exports = {
     ], {});
     
     const users = await queryInterface.sequelize.query(
-      SELECT id from "Users";
+      `SELECT id from "Users";`
     );
     
     const usersRows = users[0];
     
     return queryInterface.bulkInsert('Todos', [
       {
-        title: 'Купить продукты',
-        description: 'Молоко, хлеб, яйца',
+        title: 'Buy groceries',
+        description: 'Milk, bread, eggs',
         status: 'active',
         userId: usersRows[0].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Сделать домашку',
-        description: 'Задание по математике',
+        title: 'Do homework',
+        description: 'Math assignment',
         status: 'completed',
         userId: usersRows[0].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Позвонить маме',
-        description: 'Поздравить с днем рождения',
+        title: 'Call mom',
+        description: 'Wish happy birthday',
         status: 'pending',
         userId: usersRows[0].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Подготовить отчет',
-        description: 'Еженедельный отчет о работе',
+        title: 'Prepare report',
+        description: 'Weekly work report',
         status: 'active',
         userId: usersRows[1].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Изучить SQL',
-        description: 'Выполнить задания по SQL',
+        title: 'Study SQL',
+        description: 'Complete SQL tasks',
         status: 'active',
         userId: usersRows[1].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Запланировать отпуск',
-        description: 'Выбрать даты и отель',
+        title: 'Plan vacation',
+        description: 'Choose dates and hotel',
         status: 'pending',
         userId: usersRows[1].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Обновить резюме',
-        description: 'Добавить новые навыки',
+        title: 'Update resume',
+        description: 'Add new skills',
         status: 'active',
         userId: usersRows[2].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Купить подарок',
-        description: 'Подарок на день рождения друга',
+        title: 'Buy gift',
+        description: "Friend's birthday gift",
         status: 'completed',
         userId: usersRows[2].id,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        title: 'Записаться на курсы',
-        description: 'Курсы английского языка',
+        title: 'Enroll in courses',
+        description: 'English language courses',
         status: 'pending',
         userId: usersRows[2].id,
         createdAt: new Date(),
