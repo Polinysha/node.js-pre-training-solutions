@@ -18,7 +18,6 @@ async function processFiles() {
       })
       .catch((err) => {
         console.error(`Error reading ${files[i]}:`, err.message);
-        // Create the file for testing
         fs.writeFile(files[i], `Content of ${files[i]}`).then(() =>
           console.log(`Created ${files[i]}`)
         );
