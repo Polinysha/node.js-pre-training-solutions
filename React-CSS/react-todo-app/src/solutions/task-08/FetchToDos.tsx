@@ -14,10 +14,8 @@ export const FetchToDos: React.FC = () => {
   useEffect(() => {
     const fetchTodos = async () => {
       try {
-        // Имитация API запроса
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Моковые данные
         const mockData: Todo[] = [
           { id: 1, title: 'Buy milk', completed: false },
           { id: 2, title: 'Walk the dog', completed: true },
@@ -33,7 +31,7 @@ export const FetchToDos: React.FC = () => {
     };
 
     fetchTodos();
-  }, []); // Пустой массив зависимостей = выполняется только при монтировании
+  }, []); 
 
   if (loading) {
     return <div>Loading...</div>;
