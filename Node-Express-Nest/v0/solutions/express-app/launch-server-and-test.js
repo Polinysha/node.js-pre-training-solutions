@@ -1,16 +1,13 @@
-﻿// launch-server-and-test.js
 const { spawn } = require('child_process');
 const http = require('http');
 
 console.log('. Запускаем Express сервер...');
 
-// Запускаем сервер
 const server = spawn('node', ['index.js'], {
     stdio: ['pipe', 'pipe', 'pipe'],
     shell: true
 });
 
-// Выводим логи сервера
 server.stdout.on('data', (data) => {
     console.log(\[SERVER]: \\);
 });
@@ -19,7 +16,6 @@ server.stderr.on('data', (data) => {
     console.error(\[SERVER ERROR]: \\);
 });
 
-// Функция проверки доступности сервера
 function waitForServer(retries = 10, delay = 1000) {
     return new Promise((resolve, reject) => {
         function attempt(attemptCount) {
@@ -63,15 +59,13 @@ function waitForServer(retries = 10, delay = 1000) {
     });
 }
 
-// Основная функция
 async function main() {
     try {
-        // Ждем запуска сервера
+
         await waitForServer();
         
-        console.log('\n🧪 Запускаем тесты...');
+        console.log('\n Запускаем тесты...');
         
-        // Запускаем тесты
         const testProcess = spawn('node', ['quick-test.js'], {
             stdio: 'inherit',
             shell: true
@@ -85,7 +79,7 @@ async function main() {
             console.log('3. GET /todos/1            - задача по ID');
             console.log('4. GET /todos/search       - поиск задач');
             console.log('5. GET /static/            - статические файлы');
-            console.log('\n🛑 Для остановки сервера нажмите Ctrl+C');
+            console.log('\n Для остановки сервера нажмите Ctrl+C');
         });
         
     } catch (error) {
@@ -95,12 +89,10 @@ async function main() {
     }
 }
 
-// Обработка Ctrl+C
 process.on('SIGINT', () => {
-    console.log('\n🛑 Останавливаем сервер...');
+    console.log('\n Останавливаем сервер...');
     server.kill();
     process.exit(0);
 });
 
-// Запускаем
 main();
