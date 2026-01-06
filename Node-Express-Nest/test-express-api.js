@@ -1,41 +1,39 @@
-﻿// test-express-api.js - тестовый скрипт для проверки Express API
 const axios = require('axios');
 const API_URL = 'http://localhost:3000';
 
 async function testExpressAPI() {
-    console.log(' Тестирование Express API...\n');
+    console.log('Testing Express API...\n');
     
     try {
-        console.log('1. Тестируем GET /todos...');
-        const getResponse = await axios.get(\\/todos\);
-        console.log(' Успех! Получено задач:', getResponse.data.length);
+        console.log('1. Testing GET /todos...');
+        const getResponse = await axios.get(`${API_URL}/todos`);
+        console.log('Success! Received tasks:', getResponse.data.length);
         
-        console.log('\n2. Тестируем POST /todos...');
+        console.log('\n2. Testing POST /todos...');
         const newTodo = { title: 'Test task from script', completed: false };
-        const postResponse = await axios.post(\\/todos\, newTodo);
-        console.log(' Создана новая задача:', postResponse.data);
+        const postResponse = await axios.post(`${API_URL}/todos`, newTodo);
+        console.log('Created new task:', postResponse.data);
         
-        console.log('\n3. Тестируем GET /todos/:id...');
+        console.log('\n3. Testing GET /todos/:id...');
         const newId = postResponse.data.id;
-        const getByIdResponse = await axios.get(\\/todos/\\);
-        console.log(' Найдена задача по ID:', getByIdResponse.data);
+        const getByIdResponse = await axios.get(`${API_URL}/todos/${newId}`);
+        console.log('Found task by ID:', getByIdResponse.data);
         
-        console.log('\n4. Тестируем поиск /todos/search?completed=false...');
-        const searchResponse = await axios.get(\\/todos/search?completed=false\);
-        console.log(' Найдено незавершенных задач:', searchResponse.data.length);
+        console.log('\n4. Testing search /todos/search?completed=false...');
+        const searchResponse = await axios.get(`${API_URL}/todos/search?completed=false`);
+        console.log('Found incomplete tasks:', searchResponse.data.length);
         
-        console.log('\n Все тесты пройдены успешно!');
+        console.log('\nAll tests passed successfully!');
         
     } catch (error) {
-        console.error('\n Ошибка при тестировании:', error.message);
+        console.error('\nError during testing:', error.message);
         if (error.response) {
-            console.error('Статус:', error.response.status);
-            console.error('Данные:', error.response.data);
+            console.error('Status:', error.response.status);
+            console.error('Data:', error.response.data);
         }
     }
 }
 
-// Запускаем тест если файл выполняется напрямую
 if (require.main === module) {
     testExpressAPI();
 }
