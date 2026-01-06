@@ -2,13 +2,6 @@
 const app = express();
 const PORT = 3004;
 
-/**
- * Task 5: Request Logging and Metrics Middleware
- * Implement a middleware to log request details and track basic stats
- * Expose `/metrics` endpoint to view them.
- */
-
-// Metrics tracking class
 class MetricsTracker {
     constructor() {
         this.requests = [];
@@ -26,7 +19,6 @@ class MetricsTracker {
             }
         };
         
-        // Initialize counters
         ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].forEach(method => {
             this.metrics.byMethod[method] = 0;
         });
@@ -38,7 +30,6 @@ class MetricsTracker {
         const method = req.method;
         const statusCode = res.statusCode;
         
-        // Store request details
         const requestRecord = {
             timestamp: timestamp.toISOString(),
             method,
@@ -51,40 +42,33 @@ class MetricsTracker {
         
         this.requests.push(requestRecord);
         
-        // Keep only last 1000 requests
         if (this.requests.length > 1000) {
             this.requests.shift();
         }
         
-        // Update metrics
         this.metrics.totalRequests++;
         this.metrics.totalResponseTime += duration;
         
-        // Update by method
         if (this.metrics.byMethod[method] !== undefined) {
             this.metrics.byMethod[method]++;
         }
         
-        // Update by route
         if (!this.metrics.byRoute[route]) {
             this.metrics.byRoute[route] = { count: 0, totalTime: 0 };
         }
         this.metrics.byRoute[route].count++;
         this.metrics.byRoute[route].totalTime += duration;
         
-        // Update by status
-        const statusGroup = Math.floor(statusCode / 100) * 100; // Group by 100s
+        const statusGroup = Math.floor(statusCode / 100) * 100; 
         if (!this.metrics.byStatus[statusGroup]) {
             this.metrics.byStatus[statusGroup] = 0;
         }
         this.metrics.byStatus[statusGroup]++;
         
-        // Count errors (4xx and 5xx)
         if (statusCode >= 400) {
             this.metrics.totalErrors++;
         }
         
-        // Update last hour metrics
         const oneHourAgo = new Date(timestamp.getTime() - 60 * 60 * 1000);
         const lastHourRequests = this.requests.filter(req => 
             new Date(req.timestamp) > oneHourAgo
@@ -106,7 +90,6 @@ class MetricsTracker {
             ? (this.metrics.totalErrors / this.metrics.totalRequests) * 100
             : 0;
         
-        // Calculate average response time per route
         const routesWithAvgTime = {};
         Object.keys(this.metrics.byRoute).forEach(route => {
             const routeData = this.metrics.byRoute[route];
@@ -116,7 +99,6 @@ class MetricsTracker {
             };
         });
         
-        // Get recent requests (last 10)
         const recentRequests = this.requests.slice(-10).reverse();
         
         return {
@@ -157,31 +139,24 @@ class MetricsTracker {
     }
 }
 
-// Initialize metrics tracker
 const metricsTracker = new MetricsTracker();
 
-// Request logging and metrics middleware
 const metricsMiddleware = (req, res, next) => {
     const startTime = Date.now();
     
-    // Log request start
     console.log(`[${new Date().toISOString()}] START ${req.method} ${req.url}`);
     console.log(`  IP: ${req.ip || req.connection.remoteAddress}`);
     console.log(`  User-Agent: ${req.headers['user-agent'] || 'unknown'}`);
     console.log(`  Headers: ${JSON.stringify(req.headers)}`);
     
-    // Store original end/send methods
     const originalEnd = res.end;
     const originalSend = res.send;
     
-    // Override end method to capture response time
     res.end = function(...args) {
         const duration = Date.now() - startTime;
         
-        // Record metrics
         metricsTracker.recordRequest(req, res, duration);
         
-        // Log response
         console.log(`[${new Date().toISOString()}] END ${req.method} ${req.url}`);
         console.log(`  Status: ${res.statusCode}`);
         console.log(`  Duration: ${duration}ms`);
@@ -191,14 +166,11 @@ const metricsMiddleware = (req, res, next) => {
         return originalEnd.apply(this, args);
     };
     
-    // Also override send for consistency
     res.send = function(body) {
         const duration = Date.now() - startTime;
         
-        // Record metrics
         metricsTracker.recordRequest(req, res, duration);
         
-        // Log response
         console.log(`[${new Date().toISOString()}] END ${req.method} ${req.url}`);
         console.log(`  Status: ${res.statusCode}`);
         console.log(`  Duration: ${duration}ms`);
@@ -211,23 +183,17 @@ const metricsMiddleware = (req, res, next) => {
     next();
 };
 
-// Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Apply metrics middleware to all routes
 app.use(metricsMiddleware);
 
-// Simulated database
 let todos = [
     { id: 1, title: 'Learn Express Metrics', completed: false },
     { id: 2, title: 'Implement Middleware', completed: true },
     { id: 3, title: 'Test API Endpoints', completed: false }
 ];
 
-// Routes for demonstration
-
-// GET /todos - Get all todos
 app.get('/todos', (req, res) => {
     res.json({
         success: true,
@@ -236,7 +202,6 @@ app.get('/todos', (req, res) => {
     });
 });
 
-// GET /todos/:id - Get todo by ID
 app.get('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const todo = todos.find(t => t.id === id);
@@ -254,7 +219,6 @@ app.get('/todos/:id', (req, res) => {
     });
 });
 
-// POST /todos - Create new todo
 app.post('/todos', (req, res) => {
     const { title } = req.body;
     
@@ -281,7 +245,6 @@ app.post('/todos', (req, res) => {
     });
 });
 
-// PUT /todos/:id - Update todo
 app.put('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const { title, completed } = req.body;
@@ -309,7 +272,6 @@ app.put('/todos/:id', (req, res) => {
     });
 });
 
-// DELETE /todos/:id - Delete todo
 app.delete('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const todoIndex = todos.findIndex(t => t.id === id);
@@ -330,7 +292,6 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
-// GET /metrics - Metrics endpoint
 app.get('/metrics', (req, res) => {
     const metrics = metricsTracker.getMetrics();
     
@@ -341,7 +302,6 @@ app.get('/metrics', (req, res) => {
     });
 });
 
-// GET /metrics/reset - Reset metrics (for testing)
 app.post('/metrics/reset', (req, res) => {
     metricsTracker.reset();
     
@@ -352,7 +312,6 @@ app.post('/metrics/reset', (req, res) => {
     });
 });
 
-// GET /metrics/requests - Get detailed request log
 app.get('/metrics/requests', (req, res) => {
     const { limit = 50 } = req.query;
     const recentRequests = metricsTracker.requests
@@ -367,7 +326,6 @@ app.get('/metrics/requests', (req, res) => {
     });
 });
 
-// GET /health - Health check
 app.get('/health', (req, res) => {
     res.json({
         status: 'healthy',
@@ -378,9 +336,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Simulate error route
 app.get('/error', (req, res) => {
-    // Randomly throw error for testing metrics
     if (Math.random() > 0.5) {
         return res.status(500).json({
             success: false,
@@ -394,7 +350,6 @@ app.get('/error', (req, res) => {
     });
 });
 
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -403,7 +358,6 @@ app.use((req, res) => {
     });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error('[Server Error]', err);
     
@@ -416,7 +370,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
 app.listen(PORT, () => {
     console.log('='.repeat(50));
     console.log('Request Logging & Metrics Server');
