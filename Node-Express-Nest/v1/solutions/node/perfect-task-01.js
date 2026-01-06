@@ -27,14 +27,12 @@ class MessageSystem extends EventEmitter {
     this.messageHistory.push(message);
     this.totalMessages++;
     
-    // Count messages by type
     if (this.messagesByType[type] !== undefined) {
       this.messagesByType[type]++;
     } else {
       this.messagesByType[type] = 1;
     }
 
-    // Keep only last 10 messages
     if (this.messageHistory.length > 10) {
       this.messageHistory.shift();
     }
