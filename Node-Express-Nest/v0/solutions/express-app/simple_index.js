@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 
-// Mock data
 let todos = [
   { id: 1, title: 'Buy milk', completed: false },
   { id: 2, title: 'Learn Express.js', completed: true },
@@ -10,7 +9,6 @@ let todos = [
 
 app.use(express.json());
 
-// ????? ??????? endpoint ??? ????????????
 app.get('/todos/search', (req, res) => {
   const { completed } = req.query;
   
@@ -18,7 +16,6 @@ app.get('/todos/search', (req, res) => {
   console.log('DEBUG: Completed value:', completed);
   console.log('DEBUG: Completed type:', typeof completed);
   
-  // ??????? ?????? ??? ??????? ????????
   if (completed === 'true') {
     const result = todos.filter(todo => todo.completed === true);
     return res.json(result);
@@ -29,7 +26,6 @@ app.get('/todos/search', (req, res) => {
     return res.json(result);
   }
   
-  // ???? ???????? ?? ??????? ??? ?? true/false
   return res.json(todos);
 });
 
