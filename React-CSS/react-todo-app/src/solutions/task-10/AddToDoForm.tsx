@@ -13,18 +13,18 @@ export const AddToDoForm: React.FC = () => {
   ]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Предотвращаем перезагрузку страницы
+    e.preventDefault(); 
     
     if (inputValue.trim() === '') return;
 
     const newTodo: Todo = {
-      id: Date.now(), // Используем timestamp как ID
+      id: Date.now(), 
       title: inputValue.trim(),
       completed: false
     };
 
     setTodos(prevTodos => [...prevTodos, newTodo]);
-    setInputValue(''); // Очищаем поле ввода
+    setInputValue(''); 
   };
 
   return (
