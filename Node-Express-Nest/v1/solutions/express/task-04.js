@@ -3,14 +3,6 @@ const { body, validationResult } = require('express-validator');
 const app = express();
 const PORT = 3003;
 
-/**
- * Task 4: Wire Up ToDo REST API
- * Use Express to serve the ToDo endpoints.
- * Import shared `todoService` logic from Node phase.
- * Add middleware for request validation (e.g., title must exist).
- */
-
-// Import todoService logic (simplified version from Node tasks)
 class TodoService {
     constructor() {
         this.todos = [];
@@ -80,15 +72,12 @@ class TodoService {
     }
 }
 
-// Initialize todo service
 const todoService = new TodoService();
 
-// Add some sample todos
 todoService.createTodo({ title: 'Learn Express.js', description: 'Study middleware and routing' });
 todoService.createTodo({ title: 'Build REST API', description: 'Create ToDo API endpoints' });
 todoService.createTodo({ title: 'Implement validation', description: 'Add request validation middleware' });
 
-// Custom validation middleware
 const validateRequest = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -104,13 +93,11 @@ const validateRequest = (req, res, next) => {
     next();
 };
 
-// Request logging middleware
 const requestLogger = (req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 };
 
-// Validation schemas
 const createTodoValidation = [
     body('title')
         .notEmpty()
@@ -163,7 +150,6 @@ const updateTodoValidation = [
 app.use(express.json());
 app.use(requestLogger);
 
-// CORS middleware
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -176,15 +162,11 @@ app.use((req, res, next) => {
     next();
 });
 
-// Routes
-
-// GET /todos - Get all todos
 app.get('/todos', (req, res) => {
     const { search, completed } = req.query;
     
     let todos = todoService.getAllTodos();
     
-    // Apply filters
     if (search) {
         todos = todoService.searchTodos(search);
     }
@@ -202,7 +184,6 @@ app.get('/todos', (req, res) => {
     });
 });
 
-// GET /todos/:id - Get todo by ID
 app.get('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     
@@ -229,7 +210,6 @@ app.get('/todos/:id', (req, res) => {
     });
 });
 
-// POST /todos - Create new todo
 app.post('/todos', createTodoValidation, validateRequest, (req, res) => {
     const todo = todoService.createTodo(req.body);
     
@@ -241,7 +221,6 @@ app.post('/todos', createTodoValidation, validateRequest, (req, res) => {
     });
 });
 
-// PUT /todos/:id - Update todo
 app.put('/todos/:id', updateTodoValidation, validateRequest, (req, res) => {
     const id = parseInt(req.params.id);
     
@@ -269,7 +248,6 @@ app.put('/todos/:id', updateTodoValidation, validateRequest, (req, res) => {
     });
 });
 
-// PATCH /todos/:id - Partial update (mark as completed)
 app.patch('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     
@@ -289,7 +267,6 @@ app.patch('/todos/:id', (req, res) => {
         });
     }
     
-    // Default to toggling completion if no data provided
     const updateData = req.body.completed !== undefined 
         ? req.body 
         : { completed: !todo.completed };
@@ -304,7 +281,6 @@ app.patch('/todos/:id', (req, res) => {
     });
 });
 
-// DELETE /todos/:id - Delete todo
 app.delete('/todos/:id', (req, res) => {
     const id = parseInt(req.params.id);
     
@@ -332,9 +308,8 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
-// DELETE /todos - Delete all todos
 app.delete('/todos', (req, res) => {
-    // Reset todo service
+
     const oldTodos = [...todoService.todos];
     todoService.todos = [];
     todoService.currentId = 1;
@@ -347,7 +322,6 @@ app.delete('/todos', (req, res) => {
     });
 });
 
-// GET /todos/stats - Get todo statistics
 app.get('/todos/stats', (req, res) => {
     const stats = todoService.getStats();
     
@@ -358,7 +332,6 @@ app.get('/todos/stats', (req, res) => {
     });
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
     res.json({
         status: 'healthy',
@@ -368,7 +341,6 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error('[Server Error]', err);
     
@@ -381,7 +353,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -392,7 +363,6 @@ app.use((req, res) => {
     });
 });
 
-// Start server
 app.listen(PORT, () => {
     console.log('='.repeat(50));
     console.log('ToDo REST API Server');
