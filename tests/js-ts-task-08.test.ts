@@ -11,17 +11,13 @@ describe('Task 08: TodoService', () => {
   });
 
   it('toggleStatus should change status', async () => {
-    // Создаем полностью новый сервис с новым API для этого теста
     const service = new TodoService(new TodoApi());
     
-    // Создаем задачу
     const newTodo = await service.create('toggle-test-task');
     const todoId = newTodo.id;
     
-    // Переключаем статус используя ПРЯМОЙ ID (без поиска!)
     const toggled = await service.toggleStatus(todoId);
     
-    // Проверяем что статус изменился
     expect(toggled.status).not.toBe(newTodo.status);
   });
 
