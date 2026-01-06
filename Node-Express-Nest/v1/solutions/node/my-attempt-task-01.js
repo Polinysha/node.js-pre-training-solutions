@@ -23,7 +23,6 @@ class MessageEmitter extends EventEmitter {
     this.messages.push(message);
     this.stats.totalMessages++;
 
-    // Keep only last 10 messages
     if (this.messages.length > 10) {
       this.messages = this.messages.slice(-10);
     }
