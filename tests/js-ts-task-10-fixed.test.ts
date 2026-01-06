@@ -5,7 +5,7 @@ describe('Task 10: ToDoManager Facade', () => {
 
   beforeEach(async () => {
     manager = new ToDoManager();
-    await manager.init(); // Инициализируем перед каждым тестом
+    await manager.init(); 
   });
 
   it('init should seed data', async () => {
