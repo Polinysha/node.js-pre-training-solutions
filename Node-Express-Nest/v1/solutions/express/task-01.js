@@ -2,13 +2,6 @@
 const app = express();
 const PORT = 3000;
 
-/**
- * Task 1: Middleware Playground
- * Create and register middlewares: logger, timer, custom header injector.
- * Log the sequence of execution for each request.
- */
-
-// 1. Logger Middleware - logs request details
 const loggerMiddleware = (req, res, next) => {
     const start = Date.now();
     const requestId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -17,11 +10,9 @@ const loggerMiddleware = (req, res, next) => {
     console.log(`  Request ID: ${requestId}`);
     console.log(`  Headers: ${JSON.stringify(req.headers)}`);
     
-    // Store request ID for other middlewares
     req.requestId = requestId;
     req.startTime = start;
     
-    // Log when response is finished
     res.on('finish', () => {
         const duration = Date.now() - start;
         console.log(`[${new Date().toISOString()}] [END] ${req.method} ${req.url} - Status: ${res.statusCode} - Duration: ${duration}ms`);
@@ -32,7 +23,6 @@ const loggerMiddleware = (req, res, next) => {
     next();
 };
 
-// 2. Timer Middleware - adds response time header
 const timerMiddleware = (req, res, next) => {
     console.log(`[Timer Middleware] Request ${req.requestId} - Timer started`);
     
@@ -47,7 +37,6 @@ const timerMiddleware = (req, res, next) => {
     next();
 };
 
-// 3. Custom Header Middleware - injects custom headers
 const customHeaderMiddleware = (req, res, next) => {
     console.log(`[Header Middleware] Request ${req.requestId} - Adding custom headers`);
     
@@ -59,11 +48,9 @@ const customHeaderMiddleware = (req, res, next) => {
     next();
 };
 
-// Body Parser Middleware (built-in Express)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Register custom middlewares in specific order
 console.log('\nMiddleware Registration Order:');
 console.log('1. loggerMiddleware');
 console.log('2. timerMiddleware');
@@ -73,7 +60,6 @@ app.use(loggerMiddleware);
 app.use(timerMiddleware);
 app.use(customHeaderMiddleware);
 
-// Routes to demonstrate middleware execution
 app.get('/', (req, res) => {
     console.log(`[Route Handler] Request ${req.requestId} - Handling GET /`);
     res.json({
@@ -139,7 +125,6 @@ app.get('/api/users/:id', (req, res) => {
 app.get('/protected', (req, res) => {
     console.log(`[Route Handler] Request ${req.requestId} - Handling GET /protected`);
     
-    // Simulate authentication check
     const authToken = req.headers['authorization'];
     if (!authToken) {
         return res.status(401).json({
@@ -156,7 +141,6 @@ app.get('/protected', (req, res) => {
     });
 });
 
-// Error handling middleware (should be last)
 app.use((err, req, res, next) => {
     console.error(`[Error Middleware] Request ${req.requestId} - Error:`, err.message);
     
@@ -168,7 +152,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 404 handler
 app.use((req, res) => {
     console.log(`[404 Handler] Request ${req.requestId} - Route not found: ${req.method} ${req.url}`);
     
@@ -180,7 +163,6 @@ app.use((req, res) => {
     });
 });
 
-// Start server
 app.listen(PORT, () => {
     console.log('='.repeat(50));
     console.log('Middleware Playground Server');
