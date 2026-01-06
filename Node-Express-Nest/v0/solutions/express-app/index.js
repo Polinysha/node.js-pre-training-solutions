@@ -3,7 +3,6 @@ const app = express();
 const path = require("path");
 const fs = require("fs");
 
-// Task 1 & 2: Data storage
 let todos = [
   { id: 1, title: "Buy milk", completed: false },
   { id: 2, title: "Learn Express.js", completed: true },
@@ -11,17 +10,14 @@ let todos = [
 ];
 let nextId = 4;
 
-// Parse JSON bodies
 app.use(express.json());
 
-// Task 3: Logging Middleware
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
   console.log(`[${timestamp}] ${req.method} ${req.url}`);
   next();
 });
 
-// Root endpoint
 app.get("/", (req, res) => {
   res.json({
     message: "Express Todo API",
@@ -34,13 +30,10 @@ app.get("/", (req, res) => {
     },
   });
 });
-
-// Task 1: GET /todos endpoint
 app.get("/todos", (req, res) => {
   res.json(todos);
 });
 
-// Task 2: POST /todos endpoint
 app.post("/todos", (req, res) => {
   const { title } = req.body;
 
@@ -60,22 +53,18 @@ app.post("/todos", (req, res) => {
   res.status(201).json(newTodo);
 });
 
-// Task 10: GET /todos/search endpoint - ?????? ???? ?? /todos/:id !!!
 app.get("/todos/search", (req, res) => {
   const { completed } = req.query;
   
   console.log("=== SEARCH ENDPOINT CALLED ===");
   console.log("Query params:", req.query);
   
-  // ???? ???????? ?? ???????, ?????????? ??? todos
   if (completed === undefined || completed === null || completed === "") {
     return res.json(todos);
   }
   
-  // ??????????? ? ?????? ? ???????? ? ??????? ????????
   const completedStr = String(completed).toLowerCase();
   
-  // ????????? ????????
   if (completedStr === "true") {
     const result = todos.filter(todo => todo.completed === true);
     return res.json(result);
@@ -86,14 +75,12 @@ app.get("/todos/search", (req, res) => {
     return res.json(result);
   }
   
-  // ???? ???????? ?? "true" ? ?? "false" - ??????
   return res.status(400).json({
     error: "Completed must be 'true' or 'false'",
     received: completed
   });
 });
 
-// Task 4: GET /todos/:id endpoint - ?????? ???? ????? /todos/search !!!
 app.get("/todos/:id", (req, res) => {
   const id = parseInt(req.params.id);
 
@@ -110,15 +97,12 @@ app.get("/todos/:id", (req, res) => {
   res.json(todo);
 });
 
-// Task 8: Static Files
 const publicDir = path.join(__dirname, "public");
 
-// Create public directory if it doesn't exist
 if (!fs.existsSync(publicDir)) {
   fs.mkdirSync(publicDir, { recursive: true });
 }
 
-// Create a sample index.html in public directory
 const indexHtmlPath = path.join(publicDir, "index.html");
 if (!fs.existsSync(indexHtmlPath)) {
   const htmlContent = `
@@ -143,14 +127,12 @@ if (!fs.existsSync(indexHtmlPath)) {
 
 app.use("/static", express.static(publicDir));
 
-// Test error route for Task 7
 app.get("/test-error", (req, res, next) => {
   const error = new Error("Test error for Task 7");
   error.status = 500;
   next(error);
 });
 
-// Task 7: Error Handler Middleware
 app.use((err, req, res, next) => {
   console.error("Error:", err.message);
 
@@ -162,7 +144,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 Handler for non-existent routes
 app.use("*", (req, res) => {
   res.status(404).json({
     error: "Not Found",
@@ -170,10 +151,8 @@ app.use("*", (req, res) => {
   });
 });
 
-// Export app for testing
 module.exports = app;
 
-// Start server if run directly
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
