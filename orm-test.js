@@ -1,8 +1,7 @@
-﻿const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 const User = require('./models/user');
 const Todo = require('./models/todo');
 
-// Конфигурация Sequelize
 const sequelize = new Sequelize('todo_app', 'postgres', 'mysecretpassword', {
   host: 'localhost',
   port: 5432,
@@ -10,13 +9,11 @@ const sequelize = new Sequelize('todo_app', 'postgres', 'mysecretpassword', {
   logging: console.log
 });
 
-// Асинхронная функция для тестирования
 async function testORM() {
   try {
     await sequelize.authenticate();
-    console.log('Подключение к БД установлено успешно');
+    console.log('Database connection established successfully');
 
-    // Тест 1: Получить всех пользователей с их задачами
     const usersWithTodos = await User.findAll({
       include: [{
         model: Todo,
@@ -24,51 +21,48 @@ async function testORM() {
       }]
     });
 
-    console.log('\n=== Пользователи и их задачи ===');
+    console.log('\n=== Users and their todos ===');
     for (const user of usersWithTodos) {
-      console.log(\\nПользователь: \ (\)\);
-      console.log(\Всего задач: \\);
+      console.log(`\nUser: ${user.username} (${user.email})`);
+      console.log(`Total todos: ${user.todos.length}`);
       
       const completed = user.todos.filter(t => t.status === 'completed').length;
       const active = user.todos.filter(t => t.status === 'active').length;
       const pending = user.todos.filter(t => t.status === 'pending').length;
       
-      console.log(\Завершено: \, Активно: \, В ожидании: \\);
+      console.log(`Completed: ${completed}, Active: ${active}, Pending: ${pending}`);
       
       for (const todo of user.todos.slice(0, 2)) {
-        console.log(\  - \ [\]\);
+        console.log(`  - ${todo.title} [${todo.status}]`);
       }
       if (user.todos.length > 2) {
-        console.log(\  ... и ещё \ задач\);
+        console.log(`  ... and ${user.todos.length - 2} more tasks`);
       }
     }
 
-    // Тест 2: Создать нового пользователя и задачу
     const newUser = await User.create({
       username: 'test_user_orm',
       email: 'test_orm@example.com'
     });
 
-    console.log(\\n=== Создан новый пользователь: ID=\\);
+    console.log(`\n=== Created new user: ID=${newUser.id} ===`);
 
     const newTodo = await Todo.create({
-      title: 'Тестовая задача через ORM',
-      description: 'Создана с помощью Sequelize',
+      title: 'Test task via ORM',
+      description: 'Created using Sequelize',
       status: 'active',
       userId: newUser.id
     });
 
-    console.log(\Создана новая задача: ID=\\);
+    console.log(`Created new todo: ID=${newTodo.id}`);
 
-    // Тест 3: Обновить задачу
     await newTodo.update({
       status: 'completed',
-      description: 'Задача выполнена через ORM'
+      description: 'Task completed via ORM'
     });
 
-    console.log(\Задача обновлена: статус=\\);
+    console.log(`Todo updated: status=${newTodo.status}`);
 
-    // Тест 4: Удалить тестовые данные
     await Todo.destroy({
       where: { userId: newUser.id }
     });
@@ -77,9 +71,8 @@ async function testORM() {
       where: { id: newUser.id }
     });
 
-    console.log('\nТестовые данные удалены');
+    console.log('\nTest data cleaned up');
 
-    // Тест 5: Сложные запросы
     const stats = await Todo.findAll({
       attributes: [
         'status',
@@ -90,19 +83,18 @@ async function testORM() {
       raw: true
     });
 
-    console.log('\n=== Статистика по статусам задач ===');
+    console.log('\n=== Task status statistics ===');
     for (const stat of stats) {
-      console.log(\\: \ задач, последняя: \\);
+      console.log(`${stat.status}: ${stat.count} tasks, latest: ${stat.latest}`);
     }
 
-    console.log('\n=== Все тесты ORM выполнены успешно ===');
+    console.log('\n=== All ORM tests completed successfully ===');
 
   } catch (error) {
-    console.error('Ошибка при работе с ORM:', error);
+    console.error('Error while working with ORM:', error);
   } finally {
     await sequelize.close();
   }
 }
 
-// Запускаем тест
 testORM();
